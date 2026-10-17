@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import {
   ArrowRight,
+  Check,
   Database,
   FileText,
   Inbox,
@@ -26,6 +27,16 @@ import {
 } from "@/components/ui/dialog";
 import { Reveal } from "./reveal";
 import { SectionHeading } from "./section-heading";
+
+/** Bring the contact form into view (respecting reduced-motion preferences). */
+function scrollToContact() {
+  const prefersReduced = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+  document.getElementById("contact")?.scrollIntoView({
+    behavior: prefersReduced ? "auto" : "smooth",
+  });
+}
 
 /* ── Concept project data ────────────────────────────────────────────────
    HONESTY: every item below is a CONCEPT / DEMONSTRATION project. There are
@@ -427,7 +438,7 @@ export function Work() {
           description="These are concept and demonstration projects that show the kinds of solutions we build. Live case studies with verified client outcomes will be published here as they're authorized."
         />
 
-        <div className="mt-12 grid gap-5 md:grid-cols-2">
+        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project, i) => (
             <Reveal key={project.title} delay={i * 80}>
               <Dialog>
@@ -435,7 +446,7 @@ export function Work() {
                   {/* Decorative mockup visual */}
                   <div
                     aria-hidden="true"
-                    className="relative aspect-[16/9] overflow-hidden bg-navy-900 md:aspect-[3/1]"
+                    className="relative aspect-[16/9] overflow-hidden bg-navy-900"
                   >
                     <div className="absolute -right-8 -top-10 size-36 rounded-full bg-teal-400/10 blur-3xl" />
                     <div className="absolute inset-3 transition-transform duration-500 group-hover:scale-[1.03]">
@@ -550,6 +561,92 @@ export function Work() {
               </Dialog>
             </Reveal>
           ))}
+
+          {/* Conversion CTA — completes the desktop 3-column grid */}
+          <Reveal delay={100} className="h-full md:col-span-2">
+            <div className="relative flex h-full flex-col justify-center gap-5 overflow-hidden rounded-xl border border-navy-800 bg-navy-900 p-6 text-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover sm:p-7 lg:flex-row lg:items-center lg:justify-between">
+              {/* Decorative animated flow lines (echoes the brand workflow motif) */}
+              <svg
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 size-full opacity-20"
+                viewBox="0 0 400 100"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M-10 22 Q 90 4 190 16 T 410 10"
+                  fill="none"
+                  stroke="#2DD4BF"
+                  strokeDasharray="4 7"
+                  strokeWidth={1.2}
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                  className="animate-flow"
+                />
+                <path
+                  d="M-10 80 Q 120 96 230 78 T 410 84"
+                  fill="none"
+                  stroke="#2DD4BF"
+                  strokeDasharray="4 7"
+                  strokeWidth={1.2}
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                  className="animate-flow"
+                />
+              </svg>
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute left-[47%] top-[16%] size-1.5 rounded-full bg-teal-400/60"
+              />
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute bottom-[20%] right-[16%] size-1.5 rounded-full bg-teal-400/60"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -right-8 -top-12 size-40 rounded-full bg-teal-400/15 blur-3xl"
+              />
+
+              <div className="relative max-w-lg">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-300">
+                  Next step
+                </p>
+                <h3 className="mt-2 font-display text-lg font-semibold text-white sm:text-xl">
+                  Your project could be next.
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-navy-200">
+                  Tell us what you want to achieve — we scope it together in a
+                  free, no-pressure conversation.
+                </p>
+                <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+                  {["Free scoping call", "Clear proposal", "No obligation"].map(
+                    (item) => (
+                      <li
+                        key={item}
+                        className="flex items-center gap-1.5 text-[13px] font-medium text-navy-200"
+                      >
+                        <Check
+                          className="size-3.5 shrink-0 text-teal-300"
+                          aria-hidden="true"
+                        />
+                        {item}
+                      </li>
+                    )
+                  )}
+                </ul>
+              </div>
+
+              <Button
+                className="group relative h-11 shrink-0 px-6"
+                onClick={scrollToContact}
+              >
+                Start a Project
+                <ArrowRight
+                  className="size-4 transition-transform duration-300 group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
+              </Button>
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>

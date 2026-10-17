@@ -146,3 +146,19 @@ Work Log:
 Stage Summary:
 - Our Work visuals are now 3/1 on desktop — cards read as wide, compact feature banners
 - Mockup internals tuned so nothing clips or overflows at the reduced height
+
+---
+Task ID: 6
+Agent: Z.ai Code (main)
+Task: Our Work section — 3 cards per row on desktop (user clarified "3/1" meant 3-in-a-row, not aspect ratio)
+
+Work Log:
+- work.tsx: grid changed md:grid-cols-2 → md:grid-cols-2 lg:grid-cols-3; mockup aspect reverted from md:aspect-[3/1] back to uniform aspect-[16/9] to suit narrower cards
+- Added 6th grid slot as a conversion CTA banner (md:col-span-2) next to the 4th project card: navy-900 bg, "NEXT STEP" eyebrow, "Your project could be next." heading, description, 3 trust checks (Free scoping call / Clear proposal / No obligation), Start a Project button → scrollToContact (new local helper, reduced-motion aware)
+- Enriched CTA banner with decorative animated dashed teal flow lines (SVG, animate-flow) + node dots + glow so it fills the tall row gracefully
+- Imported Check icon from lucide-react; kept Dialog per project unchanged
+- Verified via agent-browser: desktop 1440 (3 cols + CTA spanning 2), tablet 768 (2 cols, full-width CTA), mobile 390 (stacked); CTA button scrolls to contact; 0px overflow; no console errors; lint passes
+
+Stage Summary:
+- Desktop Our Work: 3 project cards per row, 4th row shared with a wide conversion CTA banner
+- Grid slots fully balanced (no orphan card); honesty labels untouched
