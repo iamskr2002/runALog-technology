@@ -1,0 +1,655 @@
+     1→"use client";
+     2→
+     3→import type { ReactNode } from "react";
+     4→import {
+     5→  ArrowRight,
+     6→  Check,
+     7→  Database,
+     8→  FileText,
+     9→  Inbox,
+    10→  Info,
+    11→  ListChecks,
+    12→  Mail,
+    13→  type LucideIcon,
+    14→} from "lucide-react";
+    15→
+    16→import { Badge } from "@/components/ui/badge";
+    17→import { Button } from "@/components/ui/button";
+    18→import {
+    19→  Dialog,
+    20→  DialogClose,
+    21→  DialogContent,
+    22→  DialogDescription,
+    23→  DialogFooter,
+    24→  DialogHeader,
+    25→  DialogTitle,
+    26→  DialogTrigger,
+    27→} from "@/components/ui/dialog";
+    28→import { Reveal } from "./reveal";
+    29→import { SectionHeading } from "./section-heading";
+    30→
+    31→/** Bring the contact form into view (respecting reduced-motion preferences). */
+    32→function scrollToContact() {
+    33→  const prefersReduced = window.matchMedia(
+    34→    "(prefers-reduced-motion: reduce)"
+    35→  ).matches;
+    36→  document.getElementById("contact")?.scrollIntoView({
+    37→    behavior: prefersReduced ? "auto" : "smooth",
+    38→  });
+    39→}
+    40→
+    41→/* ── Concept project data ────────────────────────────────────────────────
+    42→   HONESTY: every item below is a CONCEPT / DEMONSTRATION project. There are
+    43→   no real clients, metrics, or outcomes behind these cards. */
+    44→
+    45→type ProjectVisualKind = "dashboard" | "ecommerce" | "workflow" | "campaign";
+    46→
+    47→type ConceptProject = {
+    48→  title: string;
+    49→  category: string;
+    50→  context: string;
+    51→  challenge: string;
+    52→  built: string;
+    53→  chips: string[];
+    54→  visual: ProjectVisualKind;
+    55→};
+    56→
+    57→const projects: ConceptProject[] = [
+    58→  {
+    59→    title: "Operations Control Dashboard",
+    60→    category: "Application Development",
+    61→    context: "Concept: a service business coordinating field teams and daily jobs.",
+    62→    challenge:
+    63→      "Job details scattered across spreadsheets and chat threads, with no single source of truth for schedules and status.",
+    64→    built:
+    65→      "A role-based web dashboard that centralizes jobs, schedules, and reporting, with API integrations into existing tools.",
+    66→    chips: ["Web app", "Dashboard", "Role-based access", "API integration"],
+    67→    visual: "dashboard",
+    68→  },
+    69→  {
+    70→    title: "Multi-Store E-commerce Platform",
+    71→    category: "Website Development",
+    72→    context: "Concept: a retailer moving from social selling to a full online store.",
+    73→    challenge:
+    74→      "Orders handled manually across channels, inconsistent product data, and a checkout experience that didn't build trust.",
+    75→    built:
+    76→      "A responsive storefront with a structured catalog, streamlined checkout, and an order management view for staff.",
+    77→    chips: ["E-commerce", "Responsive UX", "Checkout flow", "Performance"],
+    78→    visual: "ecommerce",
+    79→  },
+    80→  {
+    81→    title: "Workflow Automation Hub",
+    82→    category: "Business Automation",
+    83→    context: "Concept: back-office automation connecting forms, notifications, and reporting.",
+    84→    challenge:
+    85→      "Staff re-typed the same data into three systems and chased follow-ups by hand every week.",
+    86→    built:
+    87→      "An event-driven pipeline that validates submissions, syncs the CRM, sends notifications, and compiles scheduled reports.",
+    88→    chips: ["Integrations", "Notifications", "Reporting", "AI-assisted steps"],
+    89→    visual: "workflow",
+    90→  },
+    91→  {
+    92→    title: "Conversion-Focused Campaign Site",
+    93→    category: "Digital Marketing",
+    94→    context: "Concept: a launch site pairing SEO foundations with measurable campaigns.",
+    95→    challenge:
+    96→      "Traffic was arriving but bouncing — no clear funnel, weak search structure, and no measurement.",
+    97→    built:
+    98→      "A landing system with clear conversion paths, semantic SEO structure, analytics events, and A/B-ready sections.",
+    99→    chips: ["SEO", "Landing pages", "Analytics", "Campaign planning"],
+   100→    visual: "campaign",
+   101→  },
+   102→];
+   103→
+   104→/* ── Hand-built mockup helpers (decorative, aria-hidden) ────────────────── */
+   105→
+   106→function BrowserFrame({ label, children }: { label: string; children: ReactNode }) {
+   107→  return (
+   108→    <div className="flex h-full w-full flex-col overflow-hidden rounded-lg border border-white/10 bg-navy-800 shadow-2xl">
+   109→      <div className="flex items-center gap-1.5 border-b border-white/10 px-2.5 py-1">
+   110→        <span className="size-1.5 rounded-full bg-white/20" />
+   111→        <span className="size-1.5 rounded-full bg-white/20" />
+   112→        <span className="size-1.5 rounded-full bg-white/20" />
+   113→        <span className="ml-1.5 flex h-3 flex-1 items-center rounded-full bg-white/5 px-2">
+   114→          <span className="truncate text-[8px] leading-none text-navy-300">{label}</span>
+   115→        </span>
+   116→      </div>
+   117→      <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
+   118→    </div>
+   119→  );
+   120→}
+   121→
+   122→const dashboardBars = [
+   123→  { height: 42 },
+   124→  { height: 64 },
+   125→  { height: 34 },
+   126→  { height: 82 },
+   127→  { height: 52 },
+   128→  { height: 96, highlight: true },
+   129→  { height: 66 },
+   130→];
+   131→
+   132→function DashboardVisual() {
+   133→  return (
+   134→    <BrowserFrame label="ops-dashboard.example.com">
+   135→      <div className="flex h-full">
+   136→        {/* Mini sidebar */}
+   137→        <aside className="flex w-[22%] flex-col gap-1.5 border-r border-white/10 bg-navy-900/50 p-2">
+   138→          <div className="mb-1 flex items-center gap-1.5 px-0.5">
+   139→            <span className="size-2 rounded-full bg-teal-400" />
+   140→            <span className="h-1.5 w-7 rounded-full bg-white/25" />
+   141→          </div>
+   142→          <span className="h-3.5 rounded bg-teal-400/25" />
+   143→          <span className="h-3.5 rounded bg-white/10" />
+   144→          <span className="h-3.5 rounded bg-white/10" />
+   145→          <span className="h-3.5 rounded bg-white/10" />
+   146→          <span className="mt-auto h-3.5 rounded bg-white/10" />
+   147→        </aside>
+   148→        {/* Main panel */}
+   149→        <div className="flex min-w-0 flex-1 flex-col gap-2 p-2.5">
+   150→          <div className="flex items-center justify-between">
+   151→            <span className="h-2 w-16 rounded-full bg-white/25" />
+   152→            <span className="rounded bg-teal-400 px-1.5 py-0.5 text-[8px] font-bold leading-none text-navy-900">
+   153→              + New job
+   154→            </span>
+   155→          </div>
+   156→          {/* Stat tiles */}
+   157→          <div className="grid grid-cols-3 gap-1.5">
+   158→            {["Jobs", "Revenue", "Active"].map((label) => (
+   159→              <div key={label} className="rounded-md border border-white/10 bg-white/5 p-1.5">
+   160→                <span className="block text-[9px] leading-none text-navy-300">{label}</span>
+   161→                <span className="mt-1.5 block h-1.5 w-8 rounded-full bg-teal-400/40" />
+   162→              </div>
+   163→            ))}
+   164→          </div>
+   165→          {/* Chart + table */}
+   166→          <div className="flex min-h-0 flex-1 gap-1.5">
+   167→            <div className="flex min-h-0 flex-[1.3] flex-col rounded-md border border-white/10 bg-white/5 p-1.5">
+   168→              <span className="mb-1 block text-[8px] leading-none text-navy-300">This week</span>
+   169→              <div className="flex min-h-0 flex-1 items-end gap-[3px]">
+   170→                {dashboardBars.map((bar, i) => (
+   171→                  <span
+   172→                    key={i}
+   173→                    className={`block w-full rounded-sm ${bar.highlight ? "bg-teal-400" : "bg-teal-400/70"}`}
+   174→                    style={{ height: `${bar.height}%` }}
+   175→                  />
+   176→                ))}
+   177→              </div>
+   178→            </div>
+   179→            <div className="flex min-h-0 flex-1 flex-col gap-1 rounded-md border border-white/10 bg-white/5 p-1.5">
+   180→              <span className="block text-[8px] leading-none text-navy-300">Latest jobs</span>
+   181→              <div className="flex items-center justify-between rounded border border-white/10 bg-navy-900/40 px-1.5 py-0.5">
+   182→                <span className="flex items-center gap-1">
+   183→                  <span className="size-1.5 rounded-full bg-teal-400" />
+   184→                  <span className="h-1.5 w-9 rounded-full bg-white/20" />
+   185→                </span>
+   186→                <span className="rounded-sm bg-teal-400/20 px-1 py-0.5 text-[8px] font-medium leading-none text-teal-300">
+   187→                  Active
+   188→                </span>
+   189→              </div>
+   190→              <div className="flex items-center justify-between rounded border border-white/10 bg-navy-900/40 px-1.5 py-0.5">
+   191→                <span className="flex items-center gap-1">
+   192→                  <span className="size-1.5 rounded-full bg-white/30" />
+   193→                  <span className="h-1.5 w-9 rounded-full bg-white/20" />
+   194→                </span>
+   195→                <span className="rounded-sm bg-white/10 px-1 py-0.5 text-[8px] font-medium leading-none text-navy-300">
+   196→                  Queued
+   197→                </span>
+   198→              </div>
+   199→            </div>
+   200→          </div>
+   201→        </div>
+   202→      </div>
+   203→    </BrowserFrame>
+   204→  );
+   205→}
+   206→
+   207→function EcommerceVisual() {
+   208→  return (
+   209→    <BrowserFrame label="storefront.example.com">
+   210→      <div className="flex h-full flex-col">
+   211→        {/* Top nav */}
+   212→        <div className="flex items-center justify-between border-b border-white/10 px-2.5 py-1.5">
+   213→          <span className="flex items-center gap-1.5">
+   214→            <span className="size-2 rounded-full bg-teal-400" />
+   215→            <span className="h-1.5 w-9 rounded-full bg-white/25" />
+   216→          </span>
+   217→          <span className="flex items-center gap-1.5">
+   218→            <span className="h-1 w-5 rounded-full bg-white/15" />
+   219→            <span className="h-1 w-5 rounded-full bg-white/15" />
+   220→            <span className="size-2.5 rounded-full bg-white/15" />
+   221→          </span>
+   222→        </div>
+   223→        {/* Hero band */}
+   224→        <div className="mx-2.5 mt-1.5 flex items-center justify-between gap-2 rounded-md border border-white/10 bg-white/5 p-1.5">
+   225→          <div className="min-w-0 space-y-1">
+   226→            <span className="block h-2 w-20 rounded-full bg-white/30" />
+   227→            <span className="block h-1.5 w-14 rounded-full bg-white/15" />
+   228→          </div>
+   229→          <span className="shrink-0 rounded bg-teal-400 px-1.5 py-1 text-[8px] font-bold leading-none text-navy-900">
+   230→            Shop now
+   231→          </span>
+   232→        </div>
+   233→        {/* Product grid */}
+   234→        <div className="grid min-h-0 flex-1 grid-cols-3 gap-1.5 p-2">
+   235→          {["Product", "Product", "Product"].map((label, i) => (
+   236→            <div key={`${label}-${i}`} className="flex flex-col gap-1 rounded-md border border-white/10 bg-white/5 p-1.5">
+   237→              <span className="block h-6 w-full rounded bg-white/10" />
+   238→              <span className="block h-1.5 w-10 rounded-full bg-white/20" />
+   239→              <span className="block h-1.5 w-6 rounded-full bg-teal-400/50" />
+   240→              {i === 0 ? (
+   241→                <span className="mt-auto w-fit rounded-sm bg-teal-400/20 px-1 py-0.5 text-[7px] font-semibold leading-none text-teal-300">
+   242→                  Add to cart
+   243→                </span>
+   244→              ) : null}
+   245→            </div>
+   246→          ))}
+   247→        </div>
+   248→      </div>
+   249→    </BrowserFrame>
+   250→  );
+   251→}
+   252→
+   253→const workflowNodes: { label: string; icon: LucideIcon; left: string; top: string }[] = [
+   254→  { label: "Web Form", icon: Inbox, left: "17%", top: "24%" },
+   255→  { label: "Validation", icon: ListChecks, left: "50%", top: "22%" },
+   256→  { label: "CRM", icon: Database, left: "83%", top: "26%" },
+   257→  { label: "Email Alert", icon: Mail, left: "32%", top: "76%" },
+   258→  { label: "Report", icon: FileText, left: "69%", top: "74%" },
+   259→];
+   260→
+   261→function WorkflowVisual() {
+   262→  return (
+   263→    <div className="flex h-full w-full flex-col overflow-hidden rounded-lg border border-white/10 bg-navy-800 shadow-2xl">
+   264→      <div className="flex items-center gap-2 border-b border-white/10 px-2.5 py-1">
+   265→        <span className="rounded bg-teal-400/15 px-1.5 py-0.5 text-[8px] font-bold leading-none text-teal-300">
+   266→          Automation
+   267→        </span>
+   268→        <span className="h-1.5 w-14 rounded-full bg-white/20" />
+   269→        <span className="ml-auto rounded bg-white/10 px-1.5 py-0.5 text-[8px] leading-none text-navy-300">
+   270→          Live run
+   271→        </span>
+   272→      </div>
+   273→      {/* Node diagram */}
+   274→      <div className="relative min-h-0 flex-1">
+   275→        <svg
+   276→          className="absolute inset-0 size-full"
+   277→          viewBox="0 0 100 100"
+   278→          preserveAspectRatio="none"
+   279→          aria-hidden="true"
+   280→        >
+   281→          <path
+   282→            d="M17 24 Q 33 20 50 22"
+   283→            fill="none"
+   284→            stroke="#2DD4BF"
+   285→            strokeDasharray="5 6"
+   286→            strokeWidth={1.5}
+   287→            strokeOpacity={0.55}
+   288→            strokeLinecap="round"
+   289→            vectorEffect="non-scaling-stroke"
+   290→            className="animate-flow"
+   291→          />
+   292→          <path
+   293→            d="M50 22 Q 67 20 83 26"
+   294→            fill="none"
+   295→            stroke="#2DD4BF"
+   296→            strokeDasharray="5 6"
+   297→            strokeWidth={1.5}
+   298→            strokeOpacity={0.55}
+   299→            strokeLinecap="round"
+   300→            vectorEffect="non-scaling-stroke"
+   301→            className="animate-flow"
+   302→          />
+   303→          <path
+   304→            d="M50 22 C 44 40 36 56 32 76"
+   305→            fill="none"
+   306→            stroke="#2DD4BF"
+   307→            strokeDasharray="5 6"
+   308→            strokeWidth={1.5}
+   309→            strokeOpacity={0.55}
+   310→            strokeLinecap="round"
+   311→            vectorEffect="non-scaling-stroke"
+   312→            className="animate-flow"
+   313→          />
+   314→          <path
+   315→            d="M32 76 Q 50 82 69 74"
+   316→            fill="none"
+   317→            stroke="#2DD4BF"
+   318→            strokeDasharray="5 6"
+   319→            strokeWidth={1.5}
+   320→            strokeOpacity={0.55}
+   321→            strokeLinecap="round"
+   322→            vectorEffect="non-scaling-stroke"
+   323→            className="animate-flow"
+   324→          />
+   325→        </svg>
+   326→        {workflowNodes.map(({ label, icon: Icon, left, top }) => (
+   327→          <div
+   328→            key={label}
+   329→            className="absolute -translate-x-1/2 -translate-y-1/2"
+   330→            style={{ left, top }}
+   331→          >
+   332→            <div className="flex items-center gap-1 rounded-md border border-white/15 bg-navy-800 px-1.5 py-1 shadow-lg">
+   333→              <Icon className="size-2.5 text-teal-300" />
+   334→              <span className="whitespace-nowrap text-[9px] font-medium leading-none text-white">
+   335→                {label}
+   336→              </span>
+   337→            </div>
+   338→          </div>
+   339→        ))}
+   340→      </div>
+   341→    </div>
+   342→  );
+   343→}
+   344→
+   345→function CampaignVisual() {
+   346→  return (
+   347→    <div className="flex h-full w-full items-stretch gap-2.5">
+   348→      {/* Desktop mini layout */}
+   349→      <div className="min-w-0 flex-[1.7]">
+   350→        <BrowserFrame label="launch.example.com">
+   351→          <div className="flex h-full flex-col">
+   352→            <div className="flex items-center justify-between border-b border-white/10 px-2 py-1.5">
+   353→              <span className="flex items-center gap-1">
+   354→                <span className="size-1.5 rounded-full bg-teal-400" />
+   355→                <span className="h-1 w-7 rounded-full bg-white/25" />
+   356→              </span>
+   357→              <span className="flex items-center gap-1">
+   358→                <span className="h-1 w-4 rounded-full bg-white/15" />
+   359→                <span className="h-1 w-4 rounded-full bg-white/15" />
+   360→              </span>
+   361→            </div>
+   362→            <div className="relative min-h-0 flex-1 p-2.5">
+   363→              <span className="absolute right-2 top-2 rounded border border-teal-400/30 bg-teal-400/15 px-1.5 py-0.5 text-[8px] font-bold leading-none text-teal-300">
+   364→                SEO
+   365→              </span>
+   366→              <div className="flex h-full flex-col justify-center gap-1.5">
+   367→                <span className="block h-2.5 w-3/4 rounded-full bg-white/30" />
+   368→                <span className="block h-2.5 w-1/2 rounded-full bg-white/20" />
+   369→                <span className="block h-1.5 w-2/3 rounded-full bg-white/10" />
+   370→                <span className="mt-1.5 block w-fit rounded bg-teal-400 px-2 py-1 text-[8px] font-bold leading-none text-navy-900">
+   371→                  Get started
+   372→                </span>
+   373→              </div>
+   374→            </div>
+   375→            {/* Analytics strip */}
+   376→            <div className="flex items-center gap-2 border-t border-white/10 px-2 py-1.5">
+   377→              <span className="text-[9px] leading-none text-navy-300">Visits</span>
+   378→              <svg viewBox="0 0 60 18" preserveAspectRatio="none" className="h-4 min-w-0 flex-1">
+   379→                <polyline
+   380→                  points="0,14 8,12 16,13 24,9 32,10 40,6 48,7 60,3"
+   381→                  fill="none"
+   382→                  stroke="#2DD4BF"
+   383→                  strokeWidth={1.5}
+   384→                  strokeLinecap="round"
+   385→                  strokeLinejoin="round"
+   386→                  vectorEffect="non-scaling-stroke"
+   387→                />
+   388→              </svg>
+   389→              <span className="rounded-sm bg-teal-400/20 px-1 py-0.5 text-[8px] font-semibold leading-none text-teal-300">
+   390→                Trending up
+   391→              </span>
+   392→            </div>
+   393→          </div>
+   394→        </BrowserFrame>
+   395→      </div>
+   396→      {/* Phone frame */}
+   397→      <div className="flex w-[24%] shrink-0 flex-col rounded-xl border border-white/15 bg-navy-800 p-1 shadow-2xl">
+   398→        <span className="mx-auto my-1 block h-1 w-6 rounded-full bg-white/20" />
+   399→        <div className="min-h-0 flex-1 overflow-hidden rounded-lg bg-navy-900/70 p-1.5">
+   400→          <div className="flex h-full flex-col gap-1">
+   401→            <span className="block h-6 w-full rounded bg-white/10" />
+   402→            <span className="block h-1.5 w-3/4 rounded-full bg-white/30" />
+   403→            <span className="block h-1.5 w-1/2 rounded-full bg-white/15" />
+   404→            <span className="block h-1 w-2/3 rounded-full bg-white/10" />
+   405→            <span className="mt-auto block rounded bg-teal-400 py-1 text-center text-[7px] font-bold leading-none text-navy-900">
+   406→              Get started
+   407→            </span>
+   408→          </div>
+   409→        </div>
+   410→      </div>
+   411→    </div>
+   412→  );
+   413→}
+   414→
+   415→function ProjectVisual({ kind }: { kind: ProjectVisualKind }) {
+   416→  switch (kind) {
+   417→    case "dashboard":
+   418→      return <DashboardVisual />;
+   419→    case "ecommerce":
+   420→      return <EcommerceVisual />;
+   421→    case "workflow":
+   422→      return <WorkflowVisual />;
+   423→    case "campaign":
+   424→      return <CampaignVisual />;
+   425→  }
+   426→}
+   427→
+   428→/* ── Section ───────────────────────────────────────────────────────────── */
+   429→
+   430→export function Work() {
+   431→  return (
+   432→    <section id="work" aria-labelledby="work-heading" className="bg-background py-20 sm:py-24 lg:py-28">
+   433→      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   434→        <SectionHeading
+   435→          id="work-heading"
+   436→          eyebrow="Our Work"
+   437→          title="Selected solutions, clearly labeled."
+   438→          description="These are concept and demonstration projects that show the kinds of solutions we build. Live case studies with verified client outcomes will be published here as they're authorized."
+   439→        />
+   440→
+   441→        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+   442→          {projects.map((project, i) => (
+   443→            <Reveal key={project.title} delay={i * 80}>
+   444→              <Dialog>
+   445→                <article className="group flex h-full flex-col overflow-hidden rounded-xl border bg-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
+   446→                  {/* Decorative mockup visual */}
+   447→                  <div
+   448→                    aria-hidden="true"
+   449→                    className="relative aspect-[16/9] overflow-hidden bg-navy-900"
+   450→                  >
+   451→                    <div className="absolute -right-8 -top-10 size-36 rounded-full bg-teal-400/10 blur-3xl" />
+   452→                    <div className="absolute inset-3 transition-transform duration-500 group-hover:scale-[1.03]">
+   453→                      <ProjectVisual kind={project.visual} />
+   454→                    </div>
+   455→                  </div>
+   456→
+   457→                  {/* Card content */}
+   458→                  <div className="flex flex-1 flex-col gap-2.5 p-5">
+   459→                    <div className="flex flex-wrap items-center gap-2">
+   460→                      <Badge className="border-teal-600/20 bg-teal-600/10 text-teal-700">
+   461→                        {project.category}
+   462→                      </Badge>
+   463→                      <Badge variant="outline" className="text-muted-foreground">
+   464→                        Concept project
+   465→                      </Badge>
+   466→                    </div>
+   467→
+   468→                    <h3 className="font-display text-base font-semibold text-navy-900">
+   469→                      {project.title}
+   470→                    </h3>
+   471→                    <p className="line-clamp-2 text-sm text-muted-foreground">
+   472→                      {project.context}
+   473→                    </p>
+   474→
+   475→                    <ul className="flex flex-wrap gap-1.5">
+   476→                      {project.chips.map((chip) => (
+   477→                        <li
+   478→                          key={chip}
+   479→                          className="rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs text-navy-600"
+   480→                        >
+   481→                          {chip}
+   482→                        </li>
+   483→                      ))}
+   484→                    </ul>
+   485→
+   486→                    <div className="mt-auto pt-3">
+   487→                      <DialogTrigger asChild>
+   488→                        <Button
+   489→                          variant="ghost"
+   490→                          className="group/cta gap-1.5 px-0 text-teal-700 hover:bg-transparent hover:text-teal-600"
+   491→                        >
+   492→                          View project details
+   493→                          <ArrowRight
+   494→                            className="size-4 transition-transform duration-300 group-hover/cta:translate-x-1"
+   495→                            aria-hidden="true"
+   496→                          />
+   497→                        </Button>
+   498→                      </DialogTrigger>
+   499→                    </div>
+   500→                  </div>
+   501→                </article>
+   502→
+   503→                {/* Details dialog */}
+   504→                <DialogContent className="max-h-[85vh] max-w-[calc(100%-2rem)] overflow-y-auto sm:max-w-lg">
+   505→                  <DialogHeader>
+   506→                    <DialogTitle className="pr-6 font-display text-lg font-semibold text-navy-900">
+   507→                      {project.title}
+   508→                    </DialogTitle>
+   509→                    <DialogDescription>{project.context}</DialogDescription>
+   510→                  </DialogHeader>
+   511→
+   512→                  <div className="space-y-5">
+   513→                    <div>
+   514→                      <h4 className="text-sm font-semibold uppercase tracking-[0.14em] text-navy-400">
+   515→                        The challenge
+   516→                      </h4>
+   517→                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+   518→                        {project.challenge}
+   519→                      </p>
+   520→                    </div>
+   521→                    <div>
+   522→                      <h4 className="text-sm font-semibold uppercase tracking-[0.14em] text-navy-400">
+   523→                        What we built
+   524→                      </h4>
+   525→                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+   526→                        {project.built}
+   527→                      </p>
+   528→                    </div>
+   529→                    <div>
+   530→                      <h4 className="text-sm font-semibold uppercase tracking-[0.14em] text-navy-400">
+   531→                        Services involved
+   532→                      </h4>
+   533→                      <ul className="mt-2 flex flex-wrap gap-1.5">
+   534→                        {project.chips.map((chip) => (
+   535→                          <li
+   536→                            key={chip}
+   537→                            className="rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs text-navy-600"
+   538→                          >
+   539→                            {chip}
+   540→                          </li>
+   541→                        ))}
+   542→                      </ul>
+   543→                    </div>
+   544→                    <div className="rounded-lg border border-border bg-muted p-4 text-sm text-muted-foreground">
+   545→                      <p className="flex items-start gap-2.5">
+   546→                        <Info className="mt-0.5 size-4 shrink-0 text-teal-700" aria-hidden="true" />
+   547→                        <span>
+   548→                          This is a concept demonstration, not a client engagement. Real outcomes
+   549→                          are published only when verified and authorized.
+   550→                        </span>
+   551→                      </p>
+   552→                    </div>
+   553→                  </div>
+   554→
+   555→                  <DialogFooter>
+   556→                    <DialogClose asChild>
+   557→                      <Button variant="outline">Close</Button>
+   558→                    </DialogClose>
+   559→                  </DialogFooter>
+   560→                </DialogContent>
+   561→              </Dialog>
+   562→            </Reveal>
+   563→          ))}
+   564→
+   565→          {/* Conversion CTA — completes the desktop 3-column grid */}
+   566→          <Reveal delay={100} className="h-full md:col-span-2">
+   567→            <div className="relative flex h-full flex-col justify-center gap-5 overflow-hidden rounded-xl border border-navy-800 bg-navy-900 p-6 text-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover sm:p-7 lg:flex-row lg:items-center lg:justify-between">
+   568→              {/* Decorative animated flow lines (echoes the brand workflow motif) */}
+   569→              <svg
+   570→                aria-hidden="true"
+   571→                className="pointer-events-none absolute inset-0 size-full opacity-20"
+   572→                viewBox="0 0 400 100"
+   573→                preserveAspectRatio="none"
+   574→              >
+   575→                <path
+   576→                  d="M-10 22 Q 90 4 190 16 T 410 10"
+   577→                  fill="none"
+   578→                  stroke="#2DD4BF"
+   579→                  strokeDasharray="4 7"
+   580→                  strokeWidth={1.2}
+   581→                  strokeLinecap="round"
+   582→                  vectorEffect="non-scaling-stroke"
+   583→                  className="animate-flow"
+   584→                />
+   585→                <path
+   586→                  d="M-10 80 Q 120 96 230 78 T 410 84"
+   587→                  fill="none"
+   588→                  stroke="#2DD4BF"
+   589→                  strokeDasharray="4 7"
+   590→                  strokeWidth={1.2}
+   591→                  strokeLinecap="round"
+   592→                  vectorEffect="non-scaling-stroke"
+   593→                  className="animate-flow"
+   594→                />
+   595→              </svg>
+   596→              <span
+   597→                aria-hidden="true"
+   598→                className="pointer-events-none absolute left-[47%] top-[16%] size-1.5 rounded-full bg-teal-400/60"
+   599→              />
+   600→              <span
+   601→                aria-hidden="true"
+   602→                className="pointer-events-none absolute bottom-[20%] right-[16%] size-1.5 rounded-full bg-teal-400/60"
+   603→              />
+   604→              <div
+   605→                aria-hidden="true"
+   606→                className="pointer-events-none absolute -right-8 -top-12 size-40 rounded-full bg-teal-400/15 blur-3xl"
+   607→              />
+   608→
+   609→              <div className="relative max-w-lg">
+   610→                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-300">
+   611→                  Next step
+   612→                </p>
+   613→                <h3 className="mt-2 font-display text-lg font-semibold text-white sm:text-xl">
+   614→                  Your project could be next.
+   615→                </h3>
+   616→                <p className="mt-2 text-sm leading-relaxed text-navy-200">
+   617→                  Tell us what you want to achieve — we scope it together in a
+   618→                  free, no-pressure conversation.
+   619→                </p>
+   620→                <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+   621→                  {["Free scoping call", "Clear proposal", "No obligation"].map(
+   622→                    (item) => (
+   623→                      <li
+   624→                        key={item}
+   625→                        className="flex items-center gap-1.5 text-[13px] font-medium text-navy-200"
+   626→                      >
+   627→                        <Check
+   628→                          className="size-3.5 shrink-0 text-teal-300"
+   629→                          aria-hidden="true"
+   630→                        />
+   631→                        {item}
+   632→                      </li>
+   633→                    )
+   634→                  )}
+   635→                </ul>
+   636→              </div>
+   637→
+   638→              <Button
+   639→                className="group relative h-11 shrink-0 px-6"
+   640→                onClick={scrollToContact}
+   641→              >
+   642→                Start a Project
+   643→                <ArrowRight
+   644→                  className="size-4 transition-transform duration-300 group-hover:translate-x-0.5"
+   645→                  aria-hidden="true"
+   646→                />
+   647→              </Button>
+   648→            </div>
+   649→          </Reveal>
+   650→        </div>
+   651→      </div>
+   652→    </section>
+   653→  );
+   654→}
+   655→

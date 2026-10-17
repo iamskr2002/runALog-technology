@@ -31,7 +31,7 @@ const companyLinks = [
   { label: "Home", href: "/#home" },
   { label: "Services", href: "/#services" },
   { label: "Solutions", href: "/#solutions" },
-  { label: "Our Work", href: "/#work" },
+  { label: "Our Work", href: "/work" },
   { label: "Our Process", href: "/#process" },
   { label: "About Us", href: "/#about" },
   { label: "Contact", href: "/#contact" },

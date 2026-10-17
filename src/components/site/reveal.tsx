@@ -58,7 +58,9 @@ export function Reveal({
 
   return (
     <Tag
-      ref={ref as React.Ref<HTMLDivElement & HTMLElement>}
+      ref={(node: HTMLElement | null) => {
+        ref.current = node;
+      }}
       className={cn("reveal", variant === "fade" && "reveal-fade", className)}
       style={{ "--reveal-delay": `${delay}ms` } as CSSProperties}
       {...rest}
