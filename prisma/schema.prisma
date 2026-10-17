@@ -1,0 +1,23 @@
+// RunA Log Technologies — database schema (SQLite)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Project inquiries submitted through the contact / "Start a Project" form.
+model ProjectInquiry {
+  id          String   @id @default(cuid())
+  fullName    String
+  email       String
+  company     String?
+  service     String // serviceOptions slug
+  budget      String? // budgetOptions label, optional
+  timeline    String? // timelineOptions label, optional
+  description String
+  createdAt   DateTime @default(now())
+}

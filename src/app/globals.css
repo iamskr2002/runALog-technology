@@ -1,0 +1,197 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sora), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* RunA Log brand scale — deep navy foundation */
+@theme {
+  --color-navy-50: #f3f6fa;
+  --color-navy-100: #e4eaf2;
+  --color-navy-200: #c7d3e2;
+  --color-navy-300: #9db0c8;
+  --color-navy-400: #6e87a6;
+  --color-navy-500: #4a6486;
+  --color-navy-600: #354e6e;
+  --color-navy-700: #263b57;
+  --color-navy-800: #182b44;
+  --color-navy-900: #0e1d33;
+  --color-navy-950: #081222;
+
+  --shadow-card: 0 1px 2px rgb(8 18 34 / 0.04), 0 4px 16px rgb(8 18 34 / 0.06);
+  --shadow-card-hover: 0 2px 4px rgb(8 18 34 / 0.05), 0 16px 40px rgb(8 18 34 / 0.12);
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: #ffffff;
+  --foreground: #0c1a2b;
+  --card: #ffffff;
+  --card-foreground: #0c1a2b;
+  --popover: #ffffff;
+  --popover-foreground: #0c1a2b;
+  --primary: #0d9488;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0c1a2b;
+  --muted: #f5f8fb;
+  --muted-foreground: #56677c;
+  --accent: #effaf8;
+  --accent-foreground: #0f766e;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: #e3e9f1;
+  --input: #dbe3ec;
+  --ring: #14b8a6;
+  --chart-1: #14b8a6;
+  --chart-2: #0e1d33;
+  --chart-3: #2dd4bf;
+  --chart-4: #354e6e;
+  --chart-5: #5eead4;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0c1a2b;
+  --sidebar-primary: #0d9488;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #effaf8;
+  --sidebar-accent-foreground: #0f766e;
+  --sidebar-border: #e3e9f1;
+  --sidebar-ring: #14b8a6;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: #99f6e4;
+    color: #081222;
+  }
+  /* Refined scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #c7d3e2 transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: #c7d3e2;
+    border-radius: 999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: #9db0c8;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* Scroll-reveal animation system (IntersectionObserver adds .is-visible).
+   Content is fully visible without JS or when reduced motion is preferred. */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+.reveal-fade {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Hero workflow connector — animated dash flow */
+@keyframes flow-dash {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+.animate-flow {
+  animation: flow-dash 1.6s linear infinite;
+}
+
+/* Subtle float for hero visual elements */
+@keyframes gentle-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.animate-float {
+  animation: gentle-float 6s ease-in-out infinite;
+}
