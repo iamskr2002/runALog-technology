@@ -112,6 +112,29 @@ export function Contact() {
     return () => window.removeEventListener(PREFILL_EVENT, handler);
   }, [form]);
 
+  /* Support cross-page deep links (e.g. "/?service=website-development#contact"
+     from a service detail page): read, prefill, then strip the query param.
+     The setValue is deferred one frame — a synchronous call during the mount
+     cycle doesn't reach the Radix Select's rendered state. */
+  useEffect(() => {
+    const slug = new URLSearchParams(window.location.search).get("service");
+    if (!slug) return;
+    const isValid = serviceOptions.some((option) => option.slug === slug);
+    if (!isValid) return;
+    const raf = requestAnimationFrame(() => {
+      form.setValue("service", slug, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+      window.history.replaceState(
+        null,
+        "",
+        window.location.pathname + window.location.hash
+      );
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [form]);
+
   const onSubmit = async (values: InquiryFormValues) => {
     setStatus("submitting");
     setRootError(null);

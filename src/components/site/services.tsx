@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   AppWindow,
   ArrowRight,
@@ -13,25 +14,6 @@ import {
 import type { ServiceSlug } from "@/lib/site-config";
 import { Reveal } from "./reveal";
 import { SectionHeading } from "./section-heading";
-
-/**
- * Opens the project inquiry form (contact section) with the given service
- * pre-selected, then scrolls the visitor to it. Duplicated intentionally in
- * solutions-by-need.tsx so both files stay independent.
- */
-function prefillServiceAndScroll(slug?: string) {
-  if (slug) {
-    window.dispatchEvent(
-      new CustomEvent("runa:prefill-service", { detail: { service: slug } })
-    );
-  }
-  const prefersReduced = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  ).matches;
-  document.getElementById("contact")?.scrollIntoView({
-    behavior: prefersReduced ? "auto" : "smooth",
-  });
-}
 
 type Service = {
   slug: ServiceSlug;
@@ -155,14 +137,14 @@ export function Services() {
                 </ul>
 
                 <div className="mt-auto pt-5">
-                  <button
-                    type="button"
-                    onClick={() => prefillServiceAndScroll(service.slug)}
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-teal-700 transition-all duration-200 hover:gap-2.5 hover:text-teal-600 focus-visible:outline-2 focus-visible:outline-teal-600 rounded-sm"
+                  <Link
+                    href={`/services/${service.slug}`}
+                    aria-label={`Explore the ${service.title} service page`}
+                    className="inline-flex items-center gap-1.5 rounded-sm text-sm font-semibold text-teal-700 transition-all duration-200 hover:gap-2.5 hover:text-teal-600 focus-visible:outline-2 focus-visible:outline-teal-600"
                   >
                     Explore Service
                     <ArrowRight className="size-4" aria-hidden="true" />
-                  </button>
+                  </Link>
                 </div>
               </article>
             </Reveal>

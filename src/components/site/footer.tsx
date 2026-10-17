@@ -28,13 +28,13 @@ const footerLink =
   "block py-2 text-sm text-navy-300 transition-colors hover:text-teal-300";
 
 const companyLinks = [
-  { label: "Home", href: "#home" },
-  { label: "Services", href: "#services" },
-  { label: "Solutions", href: "#solutions" },
-  { label: "Our Work", href: "#work" },
-  { label: "Our Process", href: "#process" },
-  { label: "About Us", href: "#about" },
-  { label: "Contact", href: "#contact" },
+  { label: "Home", href: "/#home" },
+  { label: "Services", href: "/#services" },
+  { label: "Solutions", href: "/#solutions" },
+  { label: "Our Work", href: "/#work" },
+  { label: "Our Process", href: "/#process" },
+  { label: "About Us", href: "/#about" },
+  { label: "Contact", href: "/#contact" },
 ] as const;
 
 function LegalDialog({
@@ -125,7 +125,14 @@ export function Footer() {
           <ul className="mt-4">
             {serviceOptions.map((service) => (
               <li key={service.slug}>
-                <a href="#services" className={cn(footerLink, focusRing)}>
+                <a
+                  href={
+                    service.slug === "custom-solutions"
+                      ? "/#solutions"
+                      : `/services/${service.slug}`
+                  }
+                  className={cn(footerLink, focusRing)}
+                >
                   {service.label}
                 </a>
               </li>
@@ -191,7 +198,7 @@ export function Footer() {
             variant="outline"
             className="mt-4 border-white/20 bg-white/5 text-white hover:bg-white/15 hover:text-white"
           >
-            <a href="#contact">Start a Project</a>
+            <a href="/#contact">Start a Project</a>
           </Button>
         </div>
       </div>

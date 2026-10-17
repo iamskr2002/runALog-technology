@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { ChevronRight, Menu } from "lucide-react";
 
 import { Logo } from "@/components/site/logo";
@@ -22,8 +23,10 @@ const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 
 export function Navbar() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
-  const [active, setActive] = useState<string>("home");
+  const [active, setActive] = useState<string>(isHome ? "home" : "");
   const [open, setOpen] = useState(false);
   const visibleRef = useRef<Set<string>>(new Set());
 
@@ -77,7 +80,7 @@ export function Navbar() {
         )}
       >
         <a
-          href="#home"
+          href="/#home"
           aria-label="RunA Log Technologies — back to top"
           className={cn("inline-flex rounded-md", focusRing)}
         >
@@ -88,8 +91,8 @@ export function Navbar() {
         <nav aria-label="Primary" className="hidden lg:block">
           <ul className="flex items-center gap-1">
             {navItems.map((item) => {
-              const id = item.href.replace("#", "");
-              const isActive = active === id;
+              const id = item.href.split("#")[1] ?? "";
+              const isActive = isHome && active === id;
               return (
                 <li key={item.href}>
                   <a
@@ -118,7 +121,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <Button size="sm" asChild className="hidden sm:inline-flex">
-            <a href="#contact">Start a Project</a>
+            <a href="/#contact">Start a Project</a>
           </Button>
 
           {/* Mobile navigation */}
@@ -144,7 +147,7 @@ export function Navbar() {
               </SheetDescription>
 
               <a
-                href="#home"
+                href="/#home"
                 aria-label="RunA Log Technologies — back to top"
                 onClick={() => setOpen(false)}
                 className={cn("inline-flex rounded-md", focusRing)}
@@ -155,8 +158,8 @@ export function Navbar() {
               <nav aria-label="Mobile" className="mt-4">
                 <ul>
                   {navItems.map((item) => {
-                    const id = item.href.replace("#", "");
-                    const isActive = active === id;
+                    const id = item.href.split("#")[1] ?? "";
+                    const isActive = isHome && active === id;
                     return (
                       <li key={item.href}>
                         <a
@@ -192,7 +195,7 @@ export function Navbar() {
                 className="mt-6 h-11 w-full"
                 onClick={() => setOpen(false)}
               >
-                <a href="#contact">Start a Project</a>
+                <a href="/#contact">Start a Project</a>
               </Button>
 
               <p className="mt-4 text-sm text-muted-foreground">

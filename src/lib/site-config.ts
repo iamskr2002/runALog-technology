@@ -36,13 +36,14 @@ export const siteConfig = {
 
 export type NavItem = { label: string; href: string };
 
+/** Absolute paths (with hashes) so navigation works from subpages too. */
 export const navItems: NavItem[] = [
-  { label: "Home", href: "#home" },
-  { label: "Services", href: "#services" },
-  { label: "Solutions", href: "#solutions" },
-  { label: "Our Work", href: "#work" },
-  { label: "About Us", href: "#about" },
-  { label: "Contact", href: "#contact" },
+  { label: "Home", href: "/#home" },
+  { label: "Services", href: "/#services" },
+  { label: "Solutions", href: "/#solutions" },
+  { label: "Our Work", href: "/#work" },
+  { label: "About Us", href: "/#about" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 /** Service options shared by the Services section, solutions matching, and the inquiry form. */

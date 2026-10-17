@@ -162,3 +162,27 @@ Work Log:
 Stage Summary:
 - Desktop Our Work: 3 project cards per row, 4th row shared with a wide conversion CTA banner
 - Grid slots fully balanced (no orphan card); honesty labels untouched
+
+---
+Task ID: 7
+Agent: Z.ai Code (main)
+Task: Dedicated service detail pages for the 4 services (explanation, usefulness, packages)
+
+Work Log:
+- Created src/lib/services-data.ts: ServiceDetail content for all 4 services — overview paragraphs, 6 capability cards, 4 numbered benefits, 3 packages each (Starter/Growth/Scale-style with indicative timelines, NO fake prices), 3 FAQs; servicePageSlugs + getServiceDetail helper
+- Created src/app/services/[slug]/page.tsx (Next 16, async params): generateStaticParams + dynamicParams=false (unknown slugs → 404) + generateMetadata (title/desc/canonical/OG); sections: navy hero with animated flow lines + breadcrumb + Service NN eyebrow + dual CTA, "What we deliver" (overview + capability grid), "Why it's useful" (4 benefit cards, bg-muted), Packages (#packages anchor, 3 cards with highlighted "Most popular" tier + honesty note that scope/timelines are indicative), FAQ (native <details> accordions), related services cards, navy CTA band; Service JSON-LD; shared Navbar/Footer with mt-auto sticky footer
+- services.tsx: "Explore Service" button → Next <Link href="/services/{slug}"> (removed prefill helper)
+- site-config.ts: navItems now "/#section" absolute hrefs; navbar.tsx: usePathname guard so active section only applies on home, logo/CTA hrefs absolute; footer.tsx: each service links to its page (custom-solutions → /#solutions), company links absolute
+- contact.tsx: reads ?service= query on load, prefills the Service Required select, strips query via replaceState — setValue deferred via requestAnimationFrame because a synchronous call during the mount cycle does not reach the Radix Select rendered state (verified empirically with logging)
+- sitemap.ts: added 4 service URLs (priority 0.8)
+
+Verification (agent-browser):
+- All 4 routes 200; /services/nonexistent → 404; sitemap lists all 4
+- Full user flow: home → Explore Service → service page → package CTA → home #contact with correct service prefilled and query stripped
+- Navbar "Our Work" and footer "Digital Marketing" links navigate correctly from subpages; "View Packages" anchor scrolls; FAQ details toggle works
+- Desktop 1440 + mobile 390 render cleanly, 0px horizontal overflow, no console errors; lint passes
+
+Stage Summary:
+- 4 new SEO-ready service pages at /services/{slug}, wired from home cards, navbar, and footer
+- Contact form deep-links prefill correctly from service pages (rAF-deferred setValue)
+- No fabricated prices/outcomes: packages are indicative scope with free-scoping honesty note
