@@ -428,7 +428,7 @@ export function Work() {
           description="These are concept and demonstration projects that show the kinds of solutions we build. Live case studies with verified client outcomes will be published here as they're authorized."
         />
 
-        <div className="mt-14 grid gap-6 md:grid-cols-2">
+        <div className="mt-12 grid gap-5 md:grid-cols-2">
           {projects.map((project, i) => (
             <Reveal key={project.title} delay={i * 80}>
               <Dialog>
@@ -436,16 +436,16 @@ export function Work() {
                   {/* Decorative mockup visual */}
                   <div
                     aria-hidden="true"
-                    className="relative aspect-[16/10] overflow-hidden bg-navy-900"
+                    className="relative aspect-[16/9] overflow-hidden bg-navy-900 md:aspect-[2/1]"
                   >
                     <div className="absolute -right-10 -top-14 size-44 rounded-full bg-teal-400/10 blur-3xl" />
-                    <div className="absolute inset-4 transition-transform duration-500 group-hover:scale-[1.03] sm:inset-5">
+                    <div className="absolute inset-3 transition-transform duration-500 group-hover:scale-[1.03]">
                       <ProjectVisual kind={project.visual} />
                     </div>
                   </div>
 
                   {/* Card content */}
-                  <div className="flex flex-1 flex-col gap-3 p-6">
+                  <div className="flex flex-1 flex-col gap-2.5 p-5">
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge className="border-teal-600/20 bg-teal-600/10 text-teal-700">
                         {project.category}
@@ -455,12 +455,11 @@ export function Work() {
                       </Badge>
                     </div>
 
-                    <h3 className="font-display text-lg font-semibold text-navy-900">
+                    <h3 className="font-display text-base font-semibold text-navy-900">
                       {project.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground">{project.context}</p>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {project.challenge} {project.built}
+                    <p className="line-clamp-2 text-sm text-muted-foreground">
+                      {project.context}
                     </p>
 
                     <ul className="flex flex-wrap gap-1.5">
@@ -474,7 +473,7 @@ export function Work() {
                       ))}
                     </ul>
 
-                    <div className="mt-auto pt-2">
+                    <div className="mt-auto pt-3">
                       <DialogTrigger asChild>
                         <Button
                           variant="ghost"

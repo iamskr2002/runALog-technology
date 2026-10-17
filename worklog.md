@@ -115,3 +115,19 @@ Work Log:
 Stage Summary:
 - SITE COMPLETE AND BROWSER-VERIFIED. Single route / with all 11 brief sections implemented, responsive mobile→desktop, accessible, honest content (concept projects labeled, no fabricated claims), working inquiry pipeline with spam protection.
 - Remaining handover point: replace placeholder contact details in src/lib/site-config.ts with verified info.
+
+---
+Task ID: 4
+Agent: Z.ai Code (main)
+Task: Redesign oversized Services cards and Our Work product cards to be compact and attractive
+
+Work Log:
+- Read src/components/site/services.tsx, work.tsx, solutions-by-need.tsx, custom-solutions.tsx, globals.css to audit card sizing
+- services.tsx: grid changed md:grid-cols-2 → sm:grid-cols-2 lg:grid-cols-4 (gap-4); card padding p-6/p-8 → p-5; icon tile 12→10; title text-xl→text-base; description trimmed to one sentence; capabilities shortened to fit narrow columns; added hover top accent gradient line + numbered "01–04" watermark; checklist divider border-t
+- work.tsx: mockup visual aspect 16/10 → aspect-[16/9] md:aspect-[2/1], inset-4/5 → inset-3; content padding p-6 → p-5, gap-3 → gap-2.5; title text-lg → text-base; removed redundant challenge/built paragraph from card (full text already in details Dialog); context line gets line-clamp-2; grid mt-14 gap-6 → mt-12 gap-5
+- Verified via agent-browser at 1440×900 and 390×844: both sections render compactly, dialog opens with full details, Explore Service still scrolls+prefills contact form, 0px horizontal overflow, no console errors; lint passes
+
+Stage Summary:
+- Services cards: ~40% shorter, 4-across on desktop with numbered editorial style
+- Work cards: ~35% shorter total height, leaner content, no information lost (dialog unchanged)
+- No other sections touched; shared tokens/shadows unchanged

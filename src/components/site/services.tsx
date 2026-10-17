@@ -46,53 +46,49 @@ const services: Service[] = [
     slug: "application-development",
     icon: AppWindow,
     title: "Application Development",
-    description:
-      "Custom software built around your operations — from internal tools to customer-facing products.",
+    description: "Custom software built around how your business actually operates.",
     capabilities: [
-      "Custom web and mobile applications",
-      "Business management systems and dashboards",
-      "MVP development and product prototyping",
-      "API development and third-party integrations",
-      "Scalable, maintainable software solutions",
+      "Custom web and mobile apps",
+      "Business systems and dashboards",
+      "MVP development and prototyping",
+      "API development and integrations",
+      "Scalable, maintainable software",
     ],
   },
   {
     slug: "website-development",
     icon: MonitorSmartphone,
     title: "Website Development",
-    description:
-      "Fast, polished websites that earn trust and turn visitors into inquiries.",
+    description: "Fast, polished websites that turn visitors into inquiries.",
     capabilities: [
       "Corporate and business websites",
-      "E-commerce websites and online stores",
-      "Landing pages and conversion-focused websites",
+      "E-commerce and online stores",
+      "Conversion-focused landing pages",
       "Responsive UI/UX implementation",
-      "Website maintenance and performance optimization",
+      "Ongoing maintenance and optimization",
     ],
   },
   {
     slug: "business-automation",
     icon: Workflow,
     title: "Business Automation",
-    description:
-      "Practical automation that removes repetitive work and keeps your systems in sync.",
+    description: "Practical automation that removes repetitive manual work.",
     capabilities: [
       "Workflow and process automation",
       "API and software integrations",
-      "Automated notifications, reporting, and data handling",
-      "AI-assisted workflows where appropriate",
-      "Reduction of repetitive manual work",
+      "Automated notifications and reports",
+      "AI-assisted workflows",
+      "Fewer repetitive manual tasks",
     ],
   },
   {
     slug: "digital-marketing",
     icon: Megaphone,
     title: "Digital Marketing",
-    description:
-      "Measurable campaigns and search visibility that bring the right customers to you.",
+    description: "Measurable campaigns that bring the right customers to you.",
     capabilities: [
       "Search engine optimization",
-      "Social media strategy and management",
+      "Social media management",
       "Digital advertising campaigns",
       "Content and campaign planning",
       "Analytics and conversion optimization",
@@ -115,29 +111,42 @@ export function Services() {
           description="Everything you need to design, build, automate, and grow — delivered by specialists who understand the business behind the code."
         />
 
-        <div className="mt-14 grid gap-5 md:grid-cols-2">
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {services.map((service, i) => (
-            <Reveal key={service.slug} delay={i * 80} className="h-full">
-              <article className="group relative flex h-full flex-col rounded-xl border bg-card p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-teal-600/40 hover:shadow-card-hover focus-within:border-teal-600/40 focus-within:shadow-card-hover sm:p-8">
-                <div className="size-12 rounded-lg bg-teal-600/10 text-teal-700 flex items-center justify-center transition-colors duration-300 group-hover:bg-teal-600 group-hover:text-white">
-                  <service.icon className="size-6" aria-hidden="true" />
+            <Reveal key={service.slug} delay={i * 70} className="h-full">
+              <article className="group relative flex h-full flex-col rounded-xl border bg-card p-5 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-teal-600/40 hover:shadow-card-hover focus-within:border-teal-600/40 focus-within:shadow-card-hover">
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-x-0 top-0 h-0.5 rounded-t-xl bg-gradient-to-r from-teal-600 to-teal-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100"
+                />
+
+                <div className="flex items-center justify-between">
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-teal-600/10 text-teal-700 transition-colors duration-300 group-hover:bg-teal-600 group-hover:text-white">
+                    <service.icon className="size-5" aria-hidden="true" />
+                  </div>
+                  <span
+                    aria-hidden="true"
+                    className="font-display text-sm font-semibold tracking-wide text-navy-200"
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
                 </div>
 
-                <h3 className="mt-6 font-display text-xl font-semibold text-navy-900">
+                <h3 className="mt-4 font-display text-base font-semibold leading-snug text-navy-900">
                   {service.title}
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">
                   {service.description}
                 </p>
 
-                <ul className="mt-5 list-none space-y-2.5">
+                <ul className="mt-4 list-none space-y-2 border-t border-border/80 pt-4">
                   {service.capabilities.map((capability) => (
                     <li
                       key={capability}
-                      className="flex items-start gap-2.5 text-sm text-muted-foreground"
+                      className="flex items-start gap-2 text-[13px] leading-snug text-muted-foreground"
                     >
                       <Check
-                        className="size-4 shrink-0 text-teal-600 mt-0.5"
+                        className="mt-[3px] size-3.5 shrink-0 text-teal-600"
                         aria-hidden="true"
                       />
                       {capability}
@@ -145,7 +154,7 @@ export function Services() {
                   ))}
                 </ul>
 
-                <div className="mt-auto pt-6">
+                <div className="mt-auto pt-5">
                   <button
                     type="button"
                     onClick={() => prefillServiceAndScroll(service.slug)}
