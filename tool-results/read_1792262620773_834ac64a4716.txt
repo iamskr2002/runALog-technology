@@ -1,0 +1,287 @@
+     1→# Worklog — RunA Log Technologies Corporate Website
+     2→
+     3→Project: Next.js 16 (App Router) + Tailwind CSS 4 + shadcn/ui + Prisma (SQLite).
+     4→Single user-visible route: `/` (src/app/page.tsx). Dev server runs on port 3000 (already started, do NOT restart).
+     5→
+     6→---
+     7→
+     8→Task ID: 1
+     9→Agent: main orchestrator (Z.ai Code)
+    10→Task: Project foundation — design system, tokens, fonts, SEO metadata, shared components, Prisma schema.
+    11→
+    12→Work Log:
+    13→- Explored scaffold: Next.js 16, Tailwind 4 (@theme), shadcn/ui (New York) in src/components/ui, Prisma + SQLite configured, framer-motion/zod/react-hook-form available.
+    14→- Defined brand system in src/app/globals.css: deep navy palette (`navy-50..950` custom colors), electric teal accent (teal scale, `--primary` = teal-600 on light), soft neutral backgrounds, Inter (body) + Sora (display) via next/font.
+    15→- Added base styles: smooth scrolling with scroll-padding for sticky header offset, custom selection color, refined scrollbar, `.reveal` scroll-animation classes with prefers-reduced-motion fallbacks.
+    16→- Updated src/app/layout.tsx: Sora + Inter fonts, full SEO metadata (title template, description, OG, Twitter), kept Toaster.
+    17→- Created src/lib/site-config.ts: single source of truth for company info, nav links, service options (shared by Services section + contact form), contact details (clearly marked placeholders to replace with verified info).
+    18→- Created shared components: src/components/site/logo.tsx (SVG mark + wordmark), reveal.tsx (IntersectionObserver scroll-reveal, reduced-motion safe), section-heading.tsx (eyebrow/title/description).
+    19→- Updated prisma/schema.prisma: replaced demo models with `ProjectInquiry` model; pushed with `bun run db:push`.
+    20→
+    21→Stage Summary:
+    22→- Design language: white/soft-neutral (slate) surfaces + deep navy (navy-900 #0E1D33, navy-950 #081222) hero/CTA bands + teal accent (teal-600 interactive, teal-400 bright on navy). Fonts: Sora display, Inter body. Radius 0.75rem.
+    23→- Shared conventions for all agents: section components live in src/components/site/, use `Reveal` for scroll animations, `SectionHeading` for headers, content data in src/lib/site-config.ts where shared.
+    24→- Section ids: #home, #services, #solutions, #work, #about, #contact. Nav links + smooth scroll rely on these.
+    25→
+    26→Task ID: 1 — STATUS: COMPLETE (all foundation files verified written, DB pushed successfully)
+    27→
+    28→---
+    29→Task ID: 2-a
+    30→Agent: frontend-styling-expert
+    31→Task: Navbar, Hero, HeroVisual, Footer
+    32→
+    33→Work Log:
+    34→- Read worklog + absorbed conventions: globals.css tokens (navy scale, teal accent, .reveal/.animate-flow/.animate-float), site-config.ts, reveal/section-heading/logo components, shadcn button/sheet/dialog.
+    35→- Created src/components/site/navbar.tsx ("use client"): sticky z-50 header, skip link to #main, h-16 md:h-[4.5rem] bar with bg-white/85 backdrop-blur; scrollY>8 toggles border-border shadow-sm (transparent border at top → zero layout shift); IntersectionObserver (rootMargin "-45% 0px -50% 0px") over [home, services, solutions, work, about, contact] — furthest-down intersecting section wins, default "home"; active link = text-teal-700 font-semibold + 2px teal underline (scale-x transition), aria-current set; desktop nav maps navItems; sm+ "Start a Project" button; lg:hidden ghost icon button (size-11 for 44px target) opens controlled Sheet (side right, w-[85vw] max-w-xs) with Logo, large tappable rows with ChevronRight + active teal state, full-width Start a Project, contact email; every link/button closes the sheet; sr-only SheetTitle/Description for Radix a11y.
+    36→- Created src/components/site/hero.tsx ("use client"): section#home aria-label="Introduction", bg-navy-950; restrained decor = one radial teal glow (700px, rgba(45,212,191,0.10)) top-right + 5% white dot grid with radial mask; left column in staggered Reveals (0/80/160/240/320ms): teal eyebrow pill "Applications · Websites · Automation · Marketing", Sora h1 with teal "Forward", supporting copy from siteConfig.description, CTA row (primary Start a Project → #contact w/ ArrowRight; outline Explore Our Services → #services styled for navy), trust row (Check + 3 honest labels) + muted under-one-roof line; right column: sr-only illustration description + HeroVisual in fade Reveal.
+    37→- Created src/components/site/hero-visual.tsx ("use client"): aria-hidden hand-built product ecosystem, max-w-[560px]; browser-window mockup (depth 10, only .animate-float element — on the card, on a separate wrapper from the parallax transform so the two transforms don't conflict) with chrome bar + app.runalog.example pill, sidebar (Dashboard highlighted teal, Orders/Reports/Settings), 3 stat cards with sparklines, hand-drawn SVG area+line chart (#2DD4BF) + bar chart, 2 table rows with Active/Synced chips; workflow card (depth 16, -left-4 sm:-left-8 top-6, "Form → CRM → Invoice"); mobile app card (depth 20, -right-3 sm:-right-6 bottom-4, notch + teal 78% metric ring + 3 rows); floating chips (depth 26: API Integration / AI-assisted / SEO); z-40 dashed connector SVG overlay (3 curved paths, teal, animate-flow) with teal endpoint dots; rAF parallax on parent container: enabled only when !(prefers-reduced-motion: reduce) && pointer: fine, normalized [-1,1] cursor target, lerp 0.08, depth/2 (max ~13px, clamped ±14px), settles & stops loop when converged, full listener/rAF cleanup.
+    38→- Created src/components/site/footer.tsx ("use client"): footer mt-auto bg-navy-950; grid lg:[1.4fr_1fr_1fr_1.2fr] — brand col (Logo light, description, socials with ExternalLink + "(opens in new tab)" aria-labels), Services col (serviceOptions → #services), Company col (#home/#services/#solutions/#work/#process/#about/#contact), Contact col (mailto in teal, conditional tel/location, responseTime, navy-outline Start a Project); bottom bar with dynamic © year and two working shadcn Dialogs (Privacy Policy / Terms of Service) — short honest 3-paragraph generic text tied to siteConfig.contact.email, DialogTitle+Description, DialogClose "Close", Esc-closable; safe-area bottom padding.
+    39→- Verification: bun run lint → 0 errors (1 pre-existing warning in reveal.tsx, another agent's file, untouched); bunx tsc --noEmit → no errors in my 4 files (fixed one TS issue: siteConfig `as const` empty phone/location narrowed to never → widened via type annotation in footer); dev.log shows only a stale pre-foundation "module not found" entry, all later compiles green.
+    40→
+    41→Stage Summary:
+    42→- Files: src/components/site/navbar.tsx, hero.tsx, hero-visual.tsx, footer.tsx (all named exports, "use client", TS strict). No other files touched; no new deps; no external images.
+    43→- Deviations (documented): connector strokeDasharray "7 7" instead of "5 6" — the provided flow-dash keyframe animates dashoffset to -28, and 28 = 2×(7+7), so the dash loop is seamless (with "5 6" the pattern would visibly jump every 1.6s). Footer/hero trust list uses 3 Check items (spec text listed only 3 labels). Footer column links use py-2 (vs py-1) to approach the 44px touch-target rule.
+    44→- Wired-for-orchestrator: skip link targets #main (add <main id="main"> in page.tsx); nav/IO relies on section ids #home #services #solutions #work #about #contact (+#process in footer company links); hero visual parallax listens on the hero's right-column wrapper. Components not yet imported by page.tsx (scaffold placeholder remains) — page assembly is the next integration step.
+    45→Task ID: 2-a — STATUS: COMPLETE (4 files written, lint + type-check clean)
+    46→
+    47→Task ID: 2-b
+    48→Agent: frontend-styling-expert
+    49→Task: Services, Why Choose Us, Process timeline, Solutions by Business Need
+    50→
+    51→Work Log:
+    52→- Read worklog.md, globals.css tokens, site-config.ts, reveal.tsx, section-heading.tsx, button.tsx to absorb conventions (navy/teal palette, shadow-card/shadow-card-hover, Reveal stagger pattern, SectionHeading ids for aria-labelledby).
+    53→- Created src/components/site/services.tsx ("use client"): section #services on bg-background with SectionHeading (eyebrow "Services"); 2-col card grid (md:grid-cols-2, Reveal delay i*80); 4 service cards (AppWindow/MonitorSmartphone/Workflow/Megaphone icons in teal-600/10 tiles that invert to solid teal on hover), exact capability lists with teal Check icons, "Explore Service" footer trigger (gap-1.5→hover:gap-2.5) calling local prefillServiceAndScroll(slug) which dispatches "runa:prefill-service" and smooth-scrolls to #contact (respects prefers-reduced-motion).
+    54→- Created src/components/site/why-us.tsx (server component): section #about on bg-muted; left = 6 differentiators in sm:grid-cols-2 (Target/Puzzle/MessagesSquare/Layers/Zap/LifeBuoy in white bordered icon tiles, Reveal stagger); right = decorative (aria-hidden) "From business goal to working solution" value-flow panel with 5 node chips linked by 16px dashed SVG connectors (stroke #0D9488, dasharray 4 5, .animate-flow, icon-center aligned at 22px), last chip highlighted teal, overlapping navy-900 mini-card "Weekly demos, no surprises" with CalendarClock (-bottom-5/-right-3 sm:-right-5).
+    55→- Created src/components/site/process.tsx ("use client"): section #process, centered SectionHeading; vertical timeline in relative mx-auto max-w-3xl wrapper — 2px bg-border track (left-[19px] mobile, lg:left-1/2) + bg-teal-500 progress overlay driven by rAF-throttled scroll/resize handler (progress = clamp((viewportH*0.75 - rect.top)/rect.height, 0, 1) → style.height %), full line rendered immediately under prefers-reduced-motion, listeners cleaned on unmount; 6 alternating lg rows (even → col-1 lg:text-right, odd → col-2) each with 14px teal node dot (border-background ring), numbered card (01–06, icon + font-display title, copy) wrapped in Reveal delay i*80; valid HTML (lines live outside the <ol>).
+    56→- Created src/components/site/solutions-by-need.tsx ("use client"): section #solutions on bg-muted; 6 full-card <button>s in sm:2/lg:3 grid (Reveal delay i*60) with typographic-quoted need statements and teal mapped-service label + ArrowRight (group-hover:translate-x-1); slugs map to serviceOptions (website/application/business-automation/digital-marketing/custom-solutions), item 6 "I'm not sure what I need yet" → "Talk it through with us" with scroll-only handler; helper note under grid explains prefill behavior.
+    57→- Verified: `bun run lint` → 0 errors (only pre-existing warning in reveal.tsx, not touched); `bunx tsc --noEmit` → no errors in src/; dev.log shows steady ✓ Compiled / GET 200 (site-config module-not-found entries are stale, from before that file existed). page.tsx not modified — composition belongs to another task.
+    58→
+    59→Stage Summary:
+    60→- Files: src/components/site/services.tsx, why-us.tsx, process.tsx, solutions-by-need.tsx — named exports Services, WhyUs, Process, SolutionsByNeed (default-tone SectionHeading, ready to drop into page.tsx in this order).
+    61→- Section ids owned: #services, #about, #process, #solutions (each aria-labelledby → <id>-heading on SectionHeading).
+    62→- Contract honored: both interactive files define identical local prefillServiceAndScroll() dispatching "runa:prefill-service" {service: slug} + scrolling to #contact (reduced-motion aware); solutions card #5 prefills slug "custom-solutions" (display label "Integrations & Custom Solutions").
+    63→- All content factual/config-driven (no invented stats/logos/testimonials); animations limited to Reveal + animate-flow dash + scroll-progress line, all reduced-motion safe; hover effects are enhancement-only, controls keyboard-focusable with visible teal outlines.
+    64→
+    65→---
+    66→Task ID: 2-c
+    67→Agent: full-stack-developer
+    68→Task: Work (concept projects), Custom Solutions, Working Principles, Contact inquiry form
+    69→
+    70→Work Log:
+    71→- Read worklog.md, globals.css (navy/teal tokens, .reveal, .animate-flow, shadow-card), site-config.ts (serviceOptions slugs, budget/timeline options, contact+socials), reveal.tsx, section-heading.tsx, and ui components (button, input, textarea, select, form, dialog, badge) to lock in conventions.
+    72→- Created src/components/site/work.tsx ("use client", named export Work): section #work (aria-labelledby work-heading, bg-background) with SectionHeading eyebrow "Our Work" + honesty-forward description; md:grid-cols-2 grid of 4 CONCEPT project cards (Reveal delay i*80) — each card = hand-built aria-hidden mockup on navy-900 canvas (BrowserFrame helper with 3-dot chrome + address pill; p1 dashboard sidebar/stat tiles/div-bar chart/table rows; p2 storefront nav+hero+3 product cards with "Add to cart" chip; p3 workflow node diagram with 5 icon chips connected by dashed #2DD4BF .animate-flow SVG paths (vectorEffect non-scaling-stroke); p4 desktop+phone split with sparkline and "SEO" chip) wrapped in group-hover:scale-[1.03]; content = teal category Badge + outline "Concept project" Badge, title, context line ("Concept: …"), challenge+built summary, tech chips, ghost DialogTrigger "View project details" (ArrowRight nudges via group/cta). Per-card Dialog (max-h-[85vh] overflow-y-auto, responsive max-w) with "The challenge" / "What we built" / "Services involved" sections + Info-icon honesty note ("concept demonstration, not a client engagement") + DialogClose footer. ZERO fabricated clients/metrics/outcomes; fictional .example.com URLs only.
+    73→- Created src/components/site/custom-solutions.tsx ("use client", named export CustomSolutions): full-bleed navy-900 band with single decorative radial teal glow (opacity 0.08, aria-hidden); SectionHeading tone="on-navy" id custom-solutions-heading; 6 offering cards (Building2/Users/Smartphone/CalendarCheck/Workflow/BarChart3, teal-300 icons on white/5 hover:bg-white/10, Reveal stagger); centered CTA "Discuss Your Requirements" → prefillServiceAndScroll("custom-solutions") (identical helper: dispatches "runa:prefill-service" then scrollIntoView #contact, auto behavior under prefers-reduced-motion) + "free scoping conversation" microcopy.
+    74→- Created src/components/site/principles.tsx (server component, named export Principles): bg-muted section (no nav id), SectionHeading eyebrow "How We Work" with honest no-fake-testimonials description; 6 principle cards (ClipboardList/KeyRound/MessagesSquare/Target/ShieldCheck/LifeBuoy, teal-700 icons, shadow-card, Reveal stagger).
+    75→- Created src/components/site/contact.tsx ("use client", named export Contact) — project inquiry form: section #contact; Reveal'd intro (eyebrow "Contact", font-display h2, supporting copy); lg:grid-cols-[0.85fr_1.15fr] layout. LEFT navy panel: "What happens next" 3 numbered steps (teal-400/10 circles), mt-auto contact block with mailto (teal-300), siteConfig.socials links (ExternalLink, target _blank rel noopener, sr-only new-tab hint), responseTime note. RIGHT card: shadcn Form + react-hook-form + zodResolver (zod v4 schema: fullName min2, email, company?, service min1, budget?, timeline?, description min20, website? honeypot; onTouched mode); 2-col field grid — Full Name*/Work Email*/Company/Service Required* (Select of serviceOptions)/Estimated Budget (budgetOptions)/Project Timeline (timelineOptions)/Project Description* (Textarea rows 5); visible red * markers + aria-required + h-11 touch targets; honeypot exactly per spec (off-screen aria-hidden div, tabIndex -1, form.register("website"), form element relative). SUBMIT flow per API contract: POST /api/inquiry JSON {...values, website: values.website ?? ""}; 200+{ok:true}→success (form replaced by animated role="status" confirmation with personalized first name + email, "Send another inquiry" resets); 400→per-field setError from json.errors + root alert "Please review the highlighted fields…" (form values preserved); 429→rate-limit root alert; 500/malformed/network→generic root alert (details preserved); rootError cleared on resubmit; Loader2 "Sending…" state, submit disabled while submitting. Privacy microcopy with ShieldCheck under button. useEffect listens ONCE for window "runa:prefill-service", validates slug against serviceOptions, setValue("service", slug, {shouldValidate, shouldDirty}), no programmatic scrolling, listener removed on unmount.
+    76→- Verified: `bun run lint` → 0 errors, 0 warnings in my files (only pre-existing unused-disable warning in reveal.tsx, untouched); `bunx tsc --noEmit` → no errors in my 4 files (remaining output is other agents' in-progress hero.tsx and pre-existing examples/skills dirs); dev.log shows steady ✓ Compiled / GET 200.
+    77→
+    78→Stage Summary:
+    79→- Files created (only these 4): src/components/site/work.tsx, src/components/site/custom-solutions.tsx, src/components/site/principles.tsx, src/components/site/contact.tsx — named exports Work, CustomSolutions, Principles, Contact; no files owned by other tasks were modified; page.tsx wiring left to orchestrator.
+    80→- Section ids owned: #work, #contact (aria-labelledby <id>-heading); custom-solutions + principles intentionally have no nav ids per spec.
+    81→- API contract implemented client-side: POST /api/inquiry body {fullName, email, company?, service, budget?, timeline?, description, website:""} → 200 {ok:true} | 400 {ok:false,errors?} | 429 {ok:false} | else generic failure; honeypot always "" from real users.
+    82→- Event contract implemented: "runa:prefill-service" CustomEvent listener prefills Service Select (slug validated, unknown ignored), never scrolls programmatically.
+    83→- Honesty policy enforced: work section is 100% explicitly-labeled concept/demonstration projects (badges, context lines, dialog disclosure notes); no clients, testimonials, or metrics anywhere.
+    84→
+    85→---
+    86→Task ID: 3
+    87→Agent: main orchestrator (Z.ai Code)
+    88→Task: Backend /api/inquiry + page assembly + SEO files
+    89→
+    90→Work Log:
+    91→- Built src/app/api/inquiry/route.ts: zod server-side validation (mirrors client schema; service slug enum from site-config; optional budget/timeline whitelists), honeypot silently accepted+discarded, in-memory sliding-window rate limit (5 req / 15 min / IP), Prisma insert, safe error responses (400 with field map, 429, 500 without internals).
+    92→- Assembled src/app/page.tsx: min-h-screen flex-col wrapper, main#main with all 9 sections in order (Hero, Services, WhyUs, Process, SolutionsByNeed, Work, CustomSolutions, Principles, Contact) + Navbar/Footer, noscript reveal fallback, ProfessionalService JSON-LD.
+    93→- Added src/app/sitemap.ts; updated public/robots.txt with sitemap reference.
+    94→- Fixed unused eslint-disable warning in reveal.tsx.
+    95→- Verified via curl: valid POST stored (1 row in DB), invalid POST returned per-field errors, honeypot POST returned ok:true without storing.
+    96→- bun run lint: 0 problems.
+    97→
+    98→Stage Summary:
+    99→- Full stack wired: form (2-c) → /api/inquiry → SQLite ProjectInquiry. Event contract runa:prefill-service used by Services/Solutions/CustomSolutions → contact form prefill works.
+   100→- Site compiles, HTTP 200 on /, lint clean.
+   101→
+   102→---
+   103→Task ID: 4
+   104→Agent: main orchestrator (Z.ai Code)
+   105→Task: End-to-end verification with Agent Browser + fixes
+   106→
+   107→Work Log:
+   108→- Fixed stale Turbopack CSS cache (served old scaffold theme): restarted dev server with clean .next — custom tokens (navy, teal primary, reveal, flow-dash) now compile.
+   109→- Desktop 1440px walkthrough: hero (navy/teal, dashboard ecosystem visual, parallax wired), services grid, why-us value-flow, process timeline w/ scroll progress, solutions-by-need, work concept cards, custom-solutions navy band, principles, contact, footer — all render and reveal correctly on scroll.
+   110→- Interaction tests (all passed): nav active-section highlight; "Explore Service" → scrolls to #contact and pre-fills Service select (Business Automation); empty submit → client-side field errors; budget Select interaction; full form submit → animated success panel, personalized; project details dialog; Privacy Policy dialog; mobile 390px: hamburger → sheet nav → link closes sheet + navigates (#work); no horizontal overflow (scrollWidth 390 = clientWidth 390); sticky footer flush (gap 0 at page bottom).
+   111→- API E2E from browser: POST /api/inquiry 200 → DB row with correct service/budget; validation errors + honeypot verified earlier via curl.
+   112→- Zero page errors / zero console errors throughout.
+   113→- Cleanup: deleted test inquiries; added allowedDevOrigins to next.config.ts (silences preview-origin dev warning); final restart + smoke test (GET 200, POST 200), lint 0 problems, DB left clean.
+   114→
+   115→Stage Summary:
+   116→- SITE COMPLETE AND BROWSER-VERIFIED. Single route / with all 11 brief sections implemented, responsive mobile→desktop, accessible, honest content (concept projects labeled, no fabricated claims), working inquiry pipeline with spam protection.
+   117→- Remaining handover point: replace placeholder contact details in src/lib/site-config.ts with verified info.
+   118→
+   119→---
+   120→Task ID: 4
+   121→Agent: Z.ai Code (main)
+   122→Task: Redesign oversized Services cards and Our Work product cards to be compact and attractive
+   123→
+   124→Work Log:
+   125→- Read src/components/site/services.tsx, work.tsx, solutions-by-need.tsx, custom-solutions.tsx, globals.css to audit card sizing
+   126→- services.tsx: grid changed md:grid-cols-2 → sm:grid-cols-2 lg:grid-cols-4 (gap-4); card padding p-6/p-8 → p-5; icon tile 12→10; title text-xl→text-base; description trimmed to one sentence; capabilities shortened to fit narrow columns; added hover top accent gradient line + numbered "01–04" watermark; checklist divider border-t
+   127→- work.tsx: mockup visual aspect 16/10 → aspect-[16/9] md:aspect-[2/1], inset-4/5 → inset-3; content padding p-6 → p-5, gap-3 → gap-2.5; title text-lg → text-base; removed redundant challenge/built paragraph from card (full text already in details Dialog); context line gets line-clamp-2; grid mt-14 gap-6 → mt-12 gap-5
+   128→- Verified via agent-browser at 1440×900 and 390×844: both sections render compactly, dialog opens with full details, Explore Service still scrolls+prefills contact form, 0px horizontal overflow, no console errors; lint passes
+   129→
+   130→Stage Summary:
+   131→- Services cards: ~40% shorter, 4-across on desktop with numbered editorial style
+   132→- Work cards: ~35% shorter total height, leaner content, no information lost (dialog unchanged)
+   133→- No other sections touched; shared tokens/shadows unchanged
+   134→
+   135→---
+   136→Task ID: 5
+   137→Agent: Z.ai Code (main)
+   138→Task: Change Our Work mockup visuals to 3/1 aspect ratio on desktop
+   139→
+   140→Work Log:
+   141→- work.tsx: visual container aspect changed from `aspect-[16/9] md:aspect-[2/1]` to `aspect-[16/9] md:aspect-[3/1]` (mobile keeps 16/9)
+   142→- Compacted all four hand-built mockups for the shorter strip (~175px tall): BrowserFrame header py-1.5→py-1; dashboard stat tiles reduced to one bar, jobs rows py-1→py-0.5; ecommerce hero band mt-2/p-2→mt-1.5/p-1.5, product image h-9→h-6, grid p-2.5→p-2; workflow header py-1.5→py-1; campaign phone image h-8→h-6
+   143→- Shrunk decorative blur blob size-44/-top-14 → size-36/-top-8-ish (size-36 -top-10 -right-8)
+   144→- Verified via agent-browser: desktop 1440px shows wide banner-style cards, all 4 mockups (dashboard/ecommerce/workflow/campaign) fit cleanly; mobile 390px keeps 16/9 and renders correctly; 0px horizontal overflow; lint passes
+   145→
+   146→Stage Summary:
+   147→- Our Work visuals are now 3/1 on desktop — cards read as wide, compact feature banners
+   148→- Mockup internals tuned so nothing clips or overflows at the reduced height
+   149→
+   150→---
+   151→Task ID: 6
+   152→Agent: Z.ai Code (main)
+   153→Task: Our Work section — 3 cards per row on desktop (user clarified "3/1" meant 3-in-a-row, not aspect ratio)
+   154→
+   155→Work Log:
+   156→- work.tsx: grid changed md:grid-cols-2 → md:grid-cols-2 lg:grid-cols-3; mockup aspect reverted from md:aspect-[3/1] back to uniform aspect-[16/9] to suit narrower cards
+   157→- Added 6th grid slot as a conversion CTA banner (md:col-span-2) next to the 4th project card: navy-900 bg, "NEXT STEP" eyebrow, "Your project could be next." heading, description, 3 trust checks (Free scoping call / Clear proposal / No obligation), Start a Project button → scrollToContact (new local helper, reduced-motion aware)
+   158→- Enriched CTA banner with decorative animated dashed teal flow lines (SVG, animate-flow) + node dots + glow so it fills the tall row gracefully
+   159→- Imported Check icon from lucide-react; kept Dialog per project unchanged
+   160→- Verified via agent-browser: desktop 1440 (3 cols + CTA spanning 2), tablet 768 (2 cols, full-width CTA), mobile 390 (stacked); CTA button scrolls to contact; 0px overflow; no console errors; lint passes
+   161→
+   162→Stage Summary:
+   163→- Desktop Our Work: 3 project cards per row, 4th row shared with a wide conversion CTA banner
+   164→- Grid slots fully balanced (no orphan card); honesty labels untouched
+   165→
+   166→---
+   167→Task ID: 7
+   168→Agent: Z.ai Code (main)
+   169→Task: Dedicated service detail pages for the 4 services (explanation, usefulness, packages)
+   170→
+   171→Work Log:
+   172→- Created src/lib/services-data.ts: ServiceDetail content for all 4 services — overview paragraphs, 6 capability cards, 4 numbered benefits, 3 packages each (Starter/Growth/Scale-style with indicative timelines, NO fake prices), 3 FAQs; servicePageSlugs + getServiceDetail helper
+   173→- Created src/app/services/[slug]/page.tsx (Next 16, async params): generateStaticParams + dynamicParams=false (unknown slugs → 404) + generateMetadata (title/desc/canonical/OG); sections: navy hero with animated flow lines + breadcrumb + Service NN eyebrow + dual CTA, "What we deliver" (overview + capability grid), "Why it's useful" (4 benefit cards, bg-muted), Packages (#packages anchor, 3 cards with highlighted "Most popular" tier + honesty note that scope/timelines are indicative), FAQ (native <details> accordions), related services cards, navy CTA band; Service JSON-LD; shared Navbar/Footer with mt-auto sticky footer
+   174→- services.tsx: "Explore Service" button → Next <Link href="/services/{slug}"> (removed prefill helper)
+   175→- site-config.ts: navItems now "/#section" absolute hrefs; navbar.tsx: usePathname guard so active section only applies on home, logo/CTA hrefs absolute; footer.tsx: each service links to its page (custom-solutions → /#solutions), company links absolute
+   176→- contact.tsx: reads ?service= query on load, prefills the Service Required select, strips query via replaceState — setValue deferred via requestAnimationFrame because a synchronous call during the mount cycle does not reach the Radix Select rendered state (verified empirically with logging)
+   177→- sitemap.ts: added 4 service URLs (priority 0.8)
+   178→
+   179→Verification (agent-browser):
+   180→- All 4 routes 200; /services/nonexistent → 404; sitemap lists all 4
+   181→- Full user flow: home → Explore Service → service page → package CTA → home #contact with correct service prefilled and query stripped
+   182→- Navbar "Our Work" and footer "Digital Marketing" links navigate correctly from subpages; "View Packages" anchor scrolls; FAQ details toggle works
+   183→- Desktop 1440 + mobile 390 render cleanly, 0px horizontal overflow, no console errors; lint passes
+   184→
+   185→Stage Summary:
+   186→- 4 new SEO-ready service pages at /services/{slug}, wired from home cards, navbar, and footer
+   187→- Contact form deep-links prefill correctly from service pages (rAF-deferred setValue)
+   188→- No fabricated prices/outcomes: packages are indicative scope with free-scoping honesty note
+   189→
+   190→---
+   191→Task ID: 8
+   192→Agent: Z.ai Code (main)
+   193→Task: Admin backend foundation — DB schema, signed-cookie auth, all admin APIs (prerequisite for /work page 9-a and admin panel 9-b)
+   194→
+   195→Work Log:
+   196→- prisma/schema.prisma: ProjectInquiry gains status("new")/notes/updatedAt + 1-1 Lead? relation; new models Lead (source manual|import|website; status new|contacted|qualified|proposal|negotiation|won|lost; value; notes; inquiryId unique), Activity (type call|meeting|email|follow-up; scheduledAt; status scheduled|completed|cancelled; outcome; notes; onDelete Cascade), Client (status onboarding|active|paused|completed|churned; value; startDate; notes; leadId onDelete SetNull). `bun run db:push` OK.
+   197→- `bun add xlsx@0.18.5` for CSV/XLSX parsing.
+   198→- src/lib/admin-session.ts: HMAC-SHA256 signed session cookie via Web Crypto (node+edge safe); ADMIN_PASSWORD env override (dev default: runa-admin-2025); ADMIN_SECRET env; constant-shape password compare; helpers readSessionToken/isAdminRequest/unauthorizedResponse. Cookie: httpOnly, sameSite lax, 7 days.
+   199→- APIs created (all runtime nodejs, force-dynamic, guarded → 401 JSON):
+   200→  - POST /api/admin/login {password} → sets cookie | 401; POST /api/admin/logout → clears cookie
+   201→  - GET /api/admin/stats → {inquiries{total,new,converted}, leads{total,byStatus,won,pipelineValue}, clients{total,active}, activities{upcoming}, conversionRate, recentInquiries[6], upcomingActivities[6 incl lead{name,company}]}
+   202→  - GET /api/admin/inquiries?status=&q= ; PATCH/DELETE /api/admin/inquiries/[id] {status|notes} ; POST /api/admin/inquiries/[id]/convert → creates Lead(source=website, notes=[Website inquiry — Service|Budget|Timeline]+description), sets inquiry converted, 409 if already converted
+   203→  - GET /api/admin/leads?status=&q= (each lead + nextActivity + client) ; POST /api/admin/leads {name,...} ; GET/PATCH/DELETE /api/admin/leads/[id] (GET includes activities desc + client) ; POST /api/admin/leads/[id]/convert → creates Client(leadId, status onboarding) + lead status won, 409 if already
+   204→  - POST /api/admin/leads/import (multipart `file`; .csv/.xlsx/.xls; header alias mapping Name/Email/Phone/Company/Status/Value/Notes; status normalized; dedupe by existing email → skipped; returns {imported,skipped,total,errors[{row,reason}]})
+   205→  - GET /api/admin/activities?scope=upcoming|past|all&leadId= (includes lead{name,company,status}) ; POST /api/admin/activities {leadId,type,title,scheduledAt,notes} ; PATCH/DELETE /api/admin/activities/[id] {status,outcome,scheduledAt,title,type,notes}
+   206→  - GET/POST /api/admin/clients ; PATCH/DELETE /api/admin/clients/[id]
+   207→- public/robots.txt: added `Disallow: /admin`.
+   208→- curl E2E all green: 401 wrong pw → 200 login → 401 unauth → stats ok → public POST /api/inquiry stored → admin list ok → convert→lead (+409 repeat) → patch status → schedule activity → patch lead qualified/$12,000 → convert→client → CSV import {imported:3, skipped:1 dup email} → aggregated stats correct (pipelineValue 13000, conversionRate 25).
+   209→- Deliberately NO middleware: /admin route protection done server-side in layouts (Task 9-b) via cookies()+verifySessionToken; API routes enforce auth themselves.
+   210→
+   211→Stage Summary:
+   212→- Admin backend + auth layer complete and verified; ready for UI Task 9-b.
+   213→- Access model: /admin/* URL-only (no public links anywhere), robots disallowed, password runa-admin-2025 (override ADMIN_PASSWORD env).
+   214→- Test data currently in DB for subagent verification — Task 10 performs final cleanup.
+   215→
+   216→---
+   217→Task ID: 9
+   218→Agent: Z.ai Code (main)
+   219→Task: Planning/orchestration for 9-a (Our Work page) and 9-b (Admin panel UI) — subagents spawned in parallel; statuses recorded below in 9-a / 9-b entries.
+   220→
+   221→---
+   222→Task ID: 9-a
+   223→Agent: full-stack-developer
+   224→Task: Dedicated /work page + View All Work button (refactor project card into shared modules, 8 concept projects)
+   225→
+   226→Work Log:
+   227→- Read worklog.md + prior files (work.tsx, page.tsx, site-config.ts, footer.tsx, sitemap.ts, reveal.tsx, section-heading.tsx, custom-solutions.tsx, hero.tsx, button.tsx, layout.tsx, globals.css tokens) to match conventions before coding.
+   228→- Created src/lib/work-data.ts: exports ProjectVisualKind + ConceptProject types and conceptProjects array. Original 4 projects kept FIRST and content-identical (visuals map 1:1 to existing mockup kinds). Added 4 new concept projects mapped to the four services: ClinicFlow — Appointment Platform (Application Development, dashboard), ShopLocal Storefront (Website Development, ecommerce), InvoiceFlow Automation (Business Automation, workflow), GrowthLens Campaign Console (Digital Marketing, campaign). All contexts start with "Concept:", zero fabricated clients/metrics/outcomes.
+   229→- Created src/components/site/project-card.tsx ("use client"): moved BrowserFrame + DashboardVisual/EcommerceVisual/WorkflowVisual/CampaignVisual + ProjectVisual switch verbatim from work.tsx, plus the project card and its per-project details Dialog. Exports ProjectCard({ project, index }) with Reveal delay = index*80 (same pattern as before) so DOM output is unchanged.
+   230→- Refactored src/components/site/work.tsx: now imports ProjectCard + conceptProjects; deleted moved code; kept section #work, SectionHeading, grid (md:grid-cols-2 lg:grid-cols-3), 4 original cards and CTA banner (md:col-span-2) exactly. Added below the grid a centered Reveal row: outline Button (size lg, h-11 px-7, hover:bg-navy-950 hover:text-white) "View All Work" + ArrowRight via next/link → /work, with muted microcopy "More concept work across applications, websites, automation and marketing."
+   231→- Created src/app/work/page.tsx (server component): metadata (title absolute "Our Work — RunA Log Technologies" to avoid layout title-template duplication, description + openGraph with concept-work honesty framing, canonical /work); page shell copied from page.tsx (flex min-h-screen flex-col, noscript reveal fallback, Navbar, main#main flex-1, Footer mt-auto). Hero band: bg-navy-950 py-16 md:py-20, teal radial glow + dot grid (aria-hidden), "OUR WORK" eyebrow pill, h1 "Concept work that shows how we think." with teal highlight, honest description (self-initiated concepts), trust row (Real design & engineering approach / No fabricated client claims / Concepts across all 4 services). Grid section bg-background py-16 md:py-24 renders all 8 ProjectCards with homepage grid classes. Bottom CTA band: bg-navy-900 "Your project could be next." + primary Button "Start a Project" → /#contact and ghost "Explore Services" → /#services (both next/link).
+   232→- src/lib/site-config.ts: navItems "Our Work" href "/#work" → "/work" (only change).
+   233→- src/components/site/footer.tsx: companyLinks "Our Work" href "/#work" → "/work" (only change).
+   234→- src/app/sitemap.ts: added /work URL (monthly, priority 0.8, matching service-page pattern).
+   235→- Untouched per constraints: services.tsx, contact.tsx, hero*, navbar.tsx, admin/**, api/**, prisma/**.
+   236→- Verification: bun run lint → 0 errors. bunx tsc --noEmit → 0 errors in touched files (remaining errors are pre-existing in examples/, skills/, api/admin/activities, reveal.tsx — none mine). HTTP: GET /work → 200, GET / → 200, /sitemap.xml lists /work. dev.log: clean compile, "GET /work 200", no errors. Content spot-checks via curl confirmed all 8 projects + CTA render on /work and homepage CTA button + microcopy present.
+   237→
+   238→Stage Summary:
+   239→- Files created: src/lib/work-data.ts, src/components/site/project-card.tsx, src/app/work/page.tsx.
+   240→- Files modified: src/components/site/work.tsx (refactor + View All Work row), src/lib/site-config.ts, src/components/site/footer.tsx, src/app/sitemap.ts.
+   241→- Key decisions: shared ConceptProject/ProjectVisualKind types live in src/lib/work-data.ts; ProjectCard owns Reveal (delay=index*80) so callers just pass grid index; /work metadata uses title.absolute to render the exact required title without the root "%s | RunA Log Technologies" template duplicating the company name; outline "View All Work" uses navy-950 hover consistent with brand; all copy stays concept/honesty-framed.
+   242→
+   243→---
+   244→Task ID: 9-b
+   245→Agent: full-stack-developer
+   246→Task: Admin panel UI (login, dashboard, inquiries, leads + CSV/XLSX import, calls, clients) on /admin
+   247→
+   248→Work Log:
+   249→- Read worklog.md (Task 8 API contracts), src/lib/admin-session.ts, prisma/schema.prisma, all /api/admin routes (login, import, clients, leads, convert) and UI primitives (select size="sm", dropdown variant="destructive", sheet flex-col) before coding. Did NOT touch any public-site file; grep confirms zero /admin hrefs outside src/app/admin + src/components/admin.
+   250→- Created src/components/admin/shared.tsx ("use client"): AdminInquiry/AdminActivity/AdminLead/AdminClient/AdminStats types (ISO-string dates); status enums + label maps (inquiry/lead/activity/client); STATUS_BADGE_CLASS semantic map (new=teal, contacted/onboarding=amber, qualified=cyan, proposal=violet, negotiation=orange, won/completed/active=emerald, lost/churned=red, cancelled/paused/archived=zinc, converted=teal solid); ACTIVITY_TYPE_ICONS (call=Phone, meeting=Video, email=Mail, follow-up=RefreshCw); serviceLabel() via site-config slugs; formatMoney (USD, compact ≥$10K), formatDate, formatDateTime ("Mon, Oct 20 · 10:00"), formatRelative ("2h ago"), dateToLocalInput/localInputToIso (datetime-local ⇄ ISO with local offset); ApiError + isAuthError + apiFetch (JSON, FormData-aware headers, throws server message, 401-aware); useAdminErrorHandler hook (401 → router.replace("/admin/login"), else toast.error with server message); EmptyState component.
+   251→- Auth: src/app/admin/layout.tsx (metadata title absolute "Admin — RunA Log Technologies", robots noindex/nofollow, renders children + sonner Toaster position top-right richColors — sonner was NOT mounted globally, only the Radix Toaster, so admin scopes its own without touching root layout); src/app/admin/login/page.tsx (server: verifySessionToken via cookies() → redirect("/admin") if valid, else AdminLoginForm); src/components/admin/login-form.tsx (client: useSearchParams under Suspense; Card max-w-sm on min-h-screen zinc-50; Logo, "Admin panel" font-display, "internal use only" muted line; password show/hide Eye/EyeOff aria-label toggle; Loader2 pending; 401 → inline role=alert "Incorrect password."; success → next param validated startsWith("/admin") (open-redirect guard) → router.replace + refresh).
+   252→- Shell: src/app/admin/(panel)/layout.tsx (server guard: invalid cookie → redirect("/admin/login"); wraps children in AdminShell); src/components/admin/admin-shell.tsx (client: fixed lg+ sidebar w-64 white border-r — Logo, nav Dashboard/Inquiries/Leads/Calls & Meetings/Clients with LayoutDashboard/Inbox/Users/CalendarClock/Briefcase, active = exact /admin else startsWith, bg-teal-50 text-teal-700, aria-current; mt-auto footer "View website" ExternalLink → / and Log out (POST logout → replace /admin/login, pending state); mobile sticky h-14 top bar with hamburger → Sheet side="left" (same NavList, every item closes via onNavigate, SheetTitle wraps Logo for a11y); main lg:pl-64 with max-w-6xl p-4 md:p-8 on min-h-screen bg-zinc-50).
+   253→- Dashboard src/app/admin/(panel)/page.tsx (client): GET /api/admin/stats; header + quick actions (Add lead → /admin/leads?create=1, Schedule call → /admin/calls?create=1); 5 stat cards grid-cols-2 lg:grid-cols-5 (Inquiries + "X new" teal badge, Leads + "Pipeline $13K", Upcoming calls, Active clients + total, Conversion rate % + won); Recent inquiries card (name, company · serviceLabel, relative time, teal dot for new, empty-state copy, "View all inquiries →") and Upcoming schedule card (type icon, title, lead · company, "Mon, Oct 20 · 10:00", "View all calls & meetings →"); skeleton grid while loading; error card with Retry.
+   254→- Inquiries src/app/admin/(panel)/inquiries/page.tsx (client): fetch once + client-side search (name/email/company/description) + status Select filter; table (overflow-x-auto) with Contact stack (teal dot for new), Service badge via serviceLabel, Budget, Received (date + relative), inline status Select (converted → solid teal Badge instead; optimistic PATCH + rollback + toast "Status updated"), Eye dialog (all fields incl. description/notes/timestamps, Convert to lead → POST convert, 409 → toast.error, "Lead created — manage it in Leads"), Trash2 AlertDialog delete; per-filter empty states.
+   255→- Leads src/app/admin/(panel)/leads/page.tsx (client): Suspense + useSearchParams (?create=1 auto-opens create dialog then router.replace strips); pipeline chips All + 7 statuses with client-computed counts, active chip teal solid; table with stacked contact, Source badge (website teal/import zinc/manual outline), inline 7-status Select (optimistic+rollback+toast), formatMoney value, next activity (title + formatDateTime), relative updated, DropdownMenu actions (Edit details, Schedule call, Convert to client — disabled when already converted, destructive Delete); AlertDialogs for convert (marks won + creates client, 409 handled) and delete; LeadDialog (create/edit: name*, email/phone/company, status, value number, notes; client+server validation) and ImportDialog in separate components; ImportDialog: drag-drop dashed zone + file picker (.csv/.xlsx/.xls), "Download CSV template" Blob (Full Name,Email,Phone,Company,Status,Value,Notes + 2 example.com sample rows), FormData POST → in-dialog result panel ("X imported · Y skipped", errors list max-h-40 overflow-y-auto "Row 4: …"), Import another file/Done, 400 parse errors surfaced inline; refreshes lead list after import.
+   256→- Shared dialogs: src/components/admin/schedule-dialog.tsx (Lead Select from caller-provided list, preselected defaultLeadId; Type Select with icons; Title default "Intro call"; native datetime-local → localInputToIso; notes; POST /api/admin/activities → toast "Call scheduled" + onCreated); src/components/admin/lead-dialog.tsx and client-dialog.tsx (same patterns).
+   257→- Calls src/app/admin/(panel)/calls/page.tsx (client): GET activities?scope=all + GET leads (for ScheduleDialog select); Suspense + ?create=1; Tabs "Upcoming (n)"/"Past (n)" split client-side (scheduled && ≥now asc / rest desc); ActivityCard with date block (day + short month, amber when overdue), type icon, title, lead · company, status Badge, formatDateTime, outcome muted line on past; actions: Complete (dialog with outcome Textarea → PATCH {status:"completed",outcome}), Reschedule (datetime-local dialog → PATCH scheduledAt, prefilled via dateToLocalInput), Cancel (AlertDialog → PATCH cancelled), Delete (AlertDialog → DELETE); past scheduled items show Overdue badge + Complete + Delete only; EmptyState for both tabs incl. schedule CTA.
+   258→- Clients src/app/admin/(panel)/clients/page.tsx (client): GET /api/admin/clients; header with count + total value line; table Client/Company/Service (serviceLabel)/Status inline Select (5, optimistic+rollback+toast)/Value/Since/Source lead/Edit+Delete; ClientDialog (name*, email, phone, company, service Select of serviceOptions slugs with "Not set", status, value, native date input → startDate, notes; POST/PATCH).
+   259→- Verification: bun run lint → 0 errors; bunx tsc --noEmit → 0 errors in admin files (remaining repo errors are pre-existing in examples/, skills/, src/components/site/reveal.tsx and the Task-8 activities route — untouched per scope); curl: GET /admin unauth → 307, /admin/login → 200, wrong password → 401 "Incorrect password.", login → ok:true + cookie, /api/admin/stats|leads|clients|activities all ok:true, all 5 admin pages → 200 with cookie; dev.log clean ("✓ Compiled", no errors).
+   260→- Full browser E2E (agent-browser): login form → dashboard renders real stats (Inquiries 1, Leads 4 "Pipeline $13K", Upcoming calls 1, Active clients 1, Conversion 25%); Leads pipeline chips counts correct, Add lead dialog opens; Inquiries search/filter/table/detail dialog opens; Calls tabs Upcoming(1)/Past(0) + Complete/Reschedule/Cancel/Delete buttons and ScheduleDialog with lead select; Clients table + inline status change persisted to DB (verified via API) and reverted; mobile 390px: sticky bar + Sheet nav opens/closes on item click; Log out → /admin/login; unauth /admin → redirected to login; console clean (only pre-existing scroll-behavior warning).
+   261→
+   262→Stage Summary:
+   263→- Files created: src/app/admin/layout.tsx, src/app/admin/login/page.tsx, src/app/admin/(panel)/layout.tsx, src/app/admin/(panel)/page.tsx, src/app/admin/(panel)/inquiries/page.tsx, src/app/admin/(panel)/leads/page.tsx, src/app/admin/(panel)/calls/page.tsx, src/app/admin/(panel)/clients/page.tsx, src/components/admin/shared.tsx, src/components/admin/login-form.tsx, src/components/admin/admin-shell.tsx, src/components/admin/schedule-dialog.tsx, src/components/admin/lead-dialog.tsx, src/components/admin/import-dialog.tsx, src/components/admin/client-dialog.tsx.
+   264→- Files modified: none outside the admin surface (public site, navbar, footer, sitemap, robots untouched; no /admin links added anywhere public).
+   265→- Key decisions: sonner <Toaster> mounted inside src/app/admin/layout.tsx (root layout only mounts the Radix Toaster — deviation needed for toast() to render; scoped to admin so the public site is untouched); metadata uses title.absolute to avoid the root template duplicating the company name; list pages fetch once and filter client-side for snappy chips/search; all status Selects are optimistic with rollback; 401 handling centralized in useAdminErrorHandler; ScheduleDialog receives the caller's lead list (leads page passes its loaded list, calls page fetches leads for the select) instead of re-fetching inside the dialog; dev/test data in DB left as-is (Task 10 performs final cleanup).
+   266→
+   267→---
+   268→Task ID: 10
+   269→Agent: Z.ai Code (main)
+   270→Task: Cross-task fixes + full E2E verification (public site, work page, admin panel) + final cleanup
+   271→
+   272→Work Log:
+   273→- Fixed TS error in src/app/api/admin/activities/route.ts (union-narrowing on where clause → Prisma.ActivityWhereInput with incremental assignment).
+   274→- Fixed pre-existing TS error in src/components/site/reveal.tsx (dynamic Tag ref type under React 19 → callback ref `(node: HTMLElement | null) => { ref.current = node }`).
+   275→- Fixed Task 9-a deviation: homepage #work was rendering all 8 projects → work.tsx now uses conceptProjects.slice(0, 4) (original 4 + CTA banner preserved; all 8 only on /work).
+   276→- Agent Browser E2E (1440×900 + 390×844): homepage shows exactly 4 project cards + CTA; "View All Work" link → /work (title, 8 projects, navy hero with honesty copy, CTA band, flush footer); nav/footer "Our Work" → /work; 0px horizontal overflow on / and /work at 390px.
+   277→- Admin E2E: /admin unauth → 307 → /admin/login; wrong password → inline "Incorrect password."; login → dashboard with live stats; Inquiries: table + detail dialog + inline status select; Leads: pipeline chips w/ counts, inline status change PERSISTED to DB (verified via API), browser CSV upload → "2 imported · 0 skipped" + toast + chips update; row menu: Edit/Schedule call/Convert to client/Delete; ScheduleDialog created Intro call for Bruce Wayne (Oct 22 15:30) visible in Calls → Upcoming; Complete with outcome → moved to Past tab with outcome line; Clients table with source-lead + total value; Log out → login; guard re-redirect confirmed; mobile admin: sticky bar + Sheet nav + 2-col stat cards.
+   278→- Golden path end-to-end: public contact form submission (Sarah Chen) → success panel → appears in admin Inquiries as "New" with teal dot and correct service badge.
+   279→- Console: zero errors/warnings on fresh page loads across all admin + public pages (earlier hydration/describedby warnings were Fast-Refresh hot-reload artifacts, not reproducible).
+   280→- Final state: bun run lint → 0 problems; bunx tsc --noEmit → 0 errors in src/; dev.log clean; grep confirms zero /admin references in public site files.
+   281→- Cleanup: deleted all test data (2 inquiries, 6 leads, 2 activities, 1 client) → stats all zero; DB starts fresh for the site owner.
+   282→
+   283→Stage Summary:
+   284→- SHIPPED: /work page (8 concept projects) + View All Work button; /admin panel (login-gated, URL-only) with Dashboard, Inquiries (status workflow + convert to lead), Leads (pipeline, CSV/XLSX import, inline status, convert to client), Calls & Meetings (schedule/complete/reschedule/cancel), Clients (manage + source tracking). All browser-verified.
+   285→- Admin access: URL /admin (no public links, robots Disallow) — password runa-admin-2025 (override via ADMIN_PASSWORD env; signed httpOnly cookie session, 7 days).
+   286→- DATABASE CLEAN (no test rows). Handover notes unchanged: replace placeholder contact details in src/lib/site-config.ts before go-live.
+   287→
