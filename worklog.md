@@ -131,3 +131,18 @@ Stage Summary:
 - Services cards: ~40% shorter, 4-across on desktop with numbered editorial style
 - Work cards: ~35% shorter total height, leaner content, no information lost (dialog unchanged)
 - No other sections touched; shared tokens/shadows unchanged
+
+---
+Task ID: 5
+Agent: Z.ai Code (main)
+Task: Change Our Work mockup visuals to 3/1 aspect ratio on desktop
+
+Work Log:
+- work.tsx: visual container aspect changed from `aspect-[16/9] md:aspect-[2/1]` to `aspect-[16/9] md:aspect-[3/1]` (mobile keeps 16/9)
+- Compacted all four hand-built mockups for the shorter strip (~175px tall): BrowserFrame header py-1.5→py-1; dashboard stat tiles reduced to one bar, jobs rows py-1→py-0.5; ecommerce hero band mt-2/p-2→mt-1.5/p-1.5, product image h-9→h-6, grid p-2.5→p-2; workflow header py-1.5→py-1; campaign phone image h-8→h-6
+- Shrunk decorative blur blob size-44/-top-14 → size-36/-top-8-ish (size-36 -top-10 -right-8)
+- Verified via agent-browser: desktop 1440px shows wide banner-style cards, all 4 mockups (dashboard/ecommerce/workflow/campaign) fit cleanly; mobile 390px keeps 16/9 and renders correctly; 0px horizontal overflow; lint passes
+
+Stage Summary:
+- Our Work visuals are now 3/1 on desktop — cards read as wide, compact feature banners
+- Mockup internals tuned so nothing clips or overflows at the reduced height

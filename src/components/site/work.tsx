@@ -95,11 +95,11 @@ const projects: ConceptProject[] = [
 function BrowserFrame({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden rounded-lg border border-white/10 bg-navy-800 shadow-2xl">
-      <div className="flex items-center gap-1.5 border-b border-white/10 px-2.5 py-1.5">
+      <div className="flex items-center gap-1.5 border-b border-white/10 px-2.5 py-1">
         <span className="size-1.5 rounded-full bg-white/20" />
         <span className="size-1.5 rounded-full bg-white/20" />
         <span className="size-1.5 rounded-full bg-white/20" />
-        <span className="ml-1.5 flex h-3.5 flex-1 items-center rounded-full bg-white/5 px-2">
+        <span className="ml-1.5 flex h-3 flex-1 items-center rounded-full bg-white/5 px-2">
           <span className="truncate text-[8px] leading-none text-navy-300">{label}</span>
         </span>
       </div>
@@ -148,7 +148,6 @@ function DashboardVisual() {
               <div key={label} className="rounded-md border border-white/10 bg-white/5 p-1.5">
                 <span className="block text-[9px] leading-none text-navy-300">{label}</span>
                 <span className="mt-1.5 block h-1.5 w-8 rounded-full bg-teal-400/40" />
-                <span className="mt-1 block h-1.5 w-5 rounded-full bg-white/15" />
               </div>
             ))}
           </div>
@@ -168,7 +167,7 @@ function DashboardVisual() {
             </div>
             <div className="flex min-h-0 flex-1 flex-col gap-1 rounded-md border border-white/10 bg-white/5 p-1.5">
               <span className="block text-[8px] leading-none text-navy-300">Latest jobs</span>
-              <div className="flex items-center justify-between rounded border border-white/10 bg-navy-900/40 px-1.5 py-1">
+              <div className="flex items-center justify-between rounded border border-white/10 bg-navy-900/40 px-1.5 py-0.5">
                 <span className="flex items-center gap-1">
                   <span className="size-1.5 rounded-full bg-teal-400" />
                   <span className="h-1.5 w-9 rounded-full bg-white/20" />
@@ -177,7 +176,7 @@ function DashboardVisual() {
                   Active
                 </span>
               </div>
-              <div className="flex items-center justify-between rounded border border-white/10 bg-navy-900/40 px-1.5 py-1">
+              <div className="flex items-center justify-between rounded border border-white/10 bg-navy-900/40 px-1.5 py-0.5">
                 <span className="flex items-center gap-1">
                   <span className="size-1.5 rounded-full bg-white/30" />
                   <span className="h-1.5 w-9 rounded-full bg-white/20" />
@@ -211,7 +210,7 @@ function EcommerceVisual() {
           </span>
         </div>
         {/* Hero band */}
-        <div className="mx-2.5 mt-2 flex items-center justify-between gap-2 rounded-md border border-white/10 bg-white/5 p-2">
+        <div className="mx-2.5 mt-1.5 flex items-center justify-between gap-2 rounded-md border border-white/10 bg-white/5 p-1.5">
           <div className="min-w-0 space-y-1">
             <span className="block h-2 w-20 rounded-full bg-white/30" />
             <span className="block h-1.5 w-14 rounded-full bg-white/15" />
@@ -221,10 +220,10 @@ function EcommerceVisual() {
           </span>
         </div>
         {/* Product grid */}
-        <div className="grid min-h-0 flex-1 grid-cols-3 gap-1.5 p-2.5">
+        <div className="grid min-h-0 flex-1 grid-cols-3 gap-1.5 p-2">
           {["Product", "Product", "Product"].map((label, i) => (
             <div key={`${label}-${i}`} className="flex flex-col gap-1 rounded-md border border-white/10 bg-white/5 p-1.5">
-              <span className="block h-9 w-full rounded bg-white/10" />
+              <span className="block h-6 w-full rounded bg-white/10" />
               <span className="block h-1.5 w-10 rounded-full bg-white/20" />
               <span className="block h-1.5 w-6 rounded-full bg-teal-400/50" />
               {i === 0 ? (
@@ -251,7 +250,7 @@ const workflowNodes: { label: string; icon: LucideIcon; left: string; top: strin
 function WorkflowVisual() {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden rounded-lg border border-white/10 bg-navy-800 shadow-2xl">
-      <div className="flex items-center gap-2 border-b border-white/10 px-2.5 py-1.5">
+      <div className="flex items-center gap-2 border-b border-white/10 px-2.5 py-1">
         <span className="rounded bg-teal-400/15 px-1.5 py-0.5 text-[8px] font-bold leading-none text-teal-300">
           Automation
         </span>
@@ -388,7 +387,7 @@ function CampaignVisual() {
         <span className="mx-auto my-1 block h-1 w-6 rounded-full bg-white/20" />
         <div className="min-h-0 flex-1 overflow-hidden rounded-lg bg-navy-900/70 p-1.5">
           <div className="flex h-full flex-col gap-1">
-            <span className="block h-8 w-full rounded bg-white/10" />
+            <span className="block h-6 w-full rounded bg-white/10" />
             <span className="block h-1.5 w-3/4 rounded-full bg-white/30" />
             <span className="block h-1.5 w-1/2 rounded-full bg-white/15" />
             <span className="block h-1 w-2/3 rounded-full bg-white/10" />
@@ -436,9 +435,9 @@ export function Work() {
                   {/* Decorative mockup visual */}
                   <div
                     aria-hidden="true"
-                    className="relative aspect-[16/9] overflow-hidden bg-navy-900 md:aspect-[2/1]"
+                    className="relative aspect-[16/9] overflow-hidden bg-navy-900 md:aspect-[3/1]"
                   >
-                    <div className="absolute -right-10 -top-14 size-44 rounded-full bg-teal-400/10 blur-3xl" />
+                    <div className="absolute -right-8 -top-10 size-36 rounded-full bg-teal-400/10 blur-3xl" />
                     <div className="absolute inset-3 transition-transform duration-500 group-hover:scale-[1.03]">
                       <ProjectVisual kind={project.visual} />
                     </div>
