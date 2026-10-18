@@ -24,6 +24,8 @@ export async function GET(request: Request) {
     upcomingActivityCount,
     recentInquiries,
     upcomingActivities,
+    unassignedLeads,
+    staffRows,
   ] = await Promise.all([
     db.projectInquiry.count(),
     db.projectInquiry.count({ where: { status: "new" } }),
@@ -46,6 +48,18 @@ export async function GET(request: Request) {
       orderBy: { scheduledAt: "asc" },
       take: 6,
       include: { lead: { select: { id: true, name: true, company: true } } },
+    }),
+    db.lead.count({ where: { assignedToId: null } }),
+    db.staff.findMany({
+      orderBy: { createdAt: "asc" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        active: true,
+        _count: { select: { assignedLeads: true, activities: true } },
+      },
     }),
   ]);
 
@@ -72,6 +86,16 @@ export async function GET(request: Request) {
       activities: { upcoming: upcomingActivityCount },
       conversionRate:
         totalLeads === 0 ? 0 : Math.round((wonLeads / totalLeads) * 100),
+      unassignedLeads,
+      team: staffRows.map((member) => ({
+        id: member.id,
+        name: member.name,
+        email: member.email,
+        role: member.role,
+        active: member.active,
+        leadCount: member._count.assignedLeads,
+        activityCount: member._count.activities,
+      })),
       recentInquiries,
       upcomingActivities,
     },

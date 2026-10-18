@@ -309,6 +309,7 @@ function LeadsInner() {
                     <TableHead>Lead</TableHead>
                     <TableHead>Company</TableHead>
                     <TableHead>Source</TableHead>
+                    <TableHead>Assignee</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Value</TableHead>
                     <TableHead>Next activity</TableHead>
@@ -349,6 +350,23 @@ function LeadsInner() {
                           >
                             {source.label}
                           </Badge>
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-sm">
+                          {lead.assignedTo ? (
+                            <span className="inline-flex items-center gap-1.5 text-zinc-700">
+                              <span className="flex size-6 items-center justify-center rounded-full bg-teal-50 text-[0.65rem] font-semibold text-teal-700" aria-hidden="true">
+                                {lead.assignedTo.name
+                                  .split(" ")
+                                  .map((part) => part[0])
+                                  .slice(0, 2)
+                                  .join("")
+                                  .toUpperCase()}
+                              </span>
+                              {lead.assignedTo.name}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-zinc-400">Unassigned</span>
+                          )}
                         </TableCell>
                         <TableCell className="whitespace-nowrap">
                           <Select

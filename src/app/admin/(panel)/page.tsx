@@ -37,6 +37,7 @@ import {
   useAdminErrorHandler,
   type AdminStats,
 } from "@/components/admin/shared";
+import { cn } from "@/lib/utils";
 
 function StatCard({
   label,
@@ -201,6 +202,11 @@ export default function AdminDashboardPage() {
           label="Leads"
           icon={Users}
           value={String(stats.leads.total)}
+          badge={
+            stats.unassignedLeads > 0
+              ? `${stats.unassignedLeads} unassigned`
+              : null
+          }
           sub={`Pipeline ${formatMoney(stats.leads.pipelineValue)}`}
         />
         <StatCard
@@ -222,6 +228,80 @@ export default function AdminDashboardPage() {
           sub={`${stats.leads.won} leads won`}
         />
       </div>
+
+      {/* Team workload */}
+      <Card className="gap-0 py-0">
+        <CardHeader className="border-b border-zinc-100 px-6 py-4">
+          <CardTitle className="text-base">Team workload</CardTitle>
+          <CardDescription>
+            Who is working which leads — assign new leads from the Leads page.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="px-2 py-2">
+          {stats.team.length === 0 ? (
+            <p className="px-4 py-8 text-center text-sm text-zinc-500">
+              No staff accounts yet — create them on the Staff page.
+            </p>
+          ) : (
+            <ul className="divide-y divide-zinc-100">
+              {stats.team.map((member) => (
+                <li
+                  key={member.id}
+                  className="flex items-center gap-3 px-4 py-3"
+                >
+                  <span
+                    className="flex size-8 shrink-0 items-center justify-center rounded-full bg-teal-50 text-xs font-semibold text-teal-700"
+                    aria-hidden="true"
+                  >
+                    {member.name
+                      .split(" ")
+                      .map((part) => part[0])
+                      .slice(0, 2)
+                      .join("")
+                      .toUpperCase()}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="flex items-center gap-2 truncate text-sm font-medium text-zinc-900">
+                      {member.name}
+                      <span
+                        className={cn(
+                          "rounded-full border px-1.5 py-0.5 text-[0.65rem] font-medium",
+                          member.active
+                            ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                            : "border-red-200 bg-red-50 text-red-600"
+                        )}
+                      >
+                        {member.active ? "Active" : "Disabled"}
+                      </span>
+                    </p>
+                    <p className="truncate text-xs text-zinc-500">
+                      {member.role === "admin" ? "Admin" : "Staff"} ·{" "}
+                      {member.email}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="font-display text-sm font-bold text-zinc-900">
+                      {member.leadCount}
+                    </p>
+                    <p className="text-[0.65rem] uppercase tracking-wide text-zinc-400">
+                      leads
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+        <div className="border-t border-zinc-100 px-6 py-3">
+          <Link
+            href="/admin/staff"
+            className="inline-flex items-center gap-1 text-sm font-medium text-teal-700 transition-colors hover:text-teal-600"
+          >
+            Manage staff accounts
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
+      </Card>
 
       {/* Recent activity grids */}
       <div className="grid gap-6 lg:grid-cols-2">

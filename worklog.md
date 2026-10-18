@@ -284,3 +284,42 @@ Stage Summary:
 - SHIPPED: /work page (8 concept projects) + View All Work button; /admin panel (login-gated, URL-only) with Dashboard, Inquiries (status workflow + convert to lead), Leads (pipeline, CSV/XLSX import, inline status, convert to client), Calls & Meetings (schedule/complete/reschedule/cancel), Clients (manage + source tracking). All browser-verified.
 - Admin access: URL /admin (no public links, robots Disallow) — password runa-admin-2025 (override via ADMIN_PASSWORD env; signed httpOnly cookie session, 7 days).
 - DATABASE CLEAN (no test rows). Handover notes unchanged: replace placeholder contact details in src/lib/site-config.ts before go-live.
+---
+Task ID: 6
+Agent: database-migration-agent (subagent)
+Task: Supabase migration kit — Postgres DDL, data export script, migration guide
+
+Work Log:
+- Read worklog.md, prisma/schema.prisma (5 models: ProjectInquiry, Staff, Lead, Activity, Client) and scripts/seed-staff.ts for style conventions.
+- Created supabase/migrations/0001_init.sql: hand-written Postgres DDL mirroring schema.prisma 1:1 (model name = table name, field = column, no mapping). TEXT PRIMARY KEY ids (cuid in app layer), DateTime -> TIMESTAMPTZ, Float? -> DOUBLE PRECISION, @default(now()) -> DEFAULT now(), string/boolean defaults ('new', 'staff', 'manual', 'scheduled', 'onboarding', TRUE). Tables in FK-dependency order (ProjectInquiry, Staff, Lead, Activity, Client). FKs: Lead.inquiryId -> ProjectInquiry (unique, SET NULL / CASCADE), Lead.assignedToId -> Staff (SET NULL / CASCADE), Activity.leadId -> Lead (CASCADE / CASCADE), Activity.createdById -> Staff (SET NULL / CASCADE), Client.leadId -> Lead (unique, SET NULL / CASCADE). Unique constraints + Prisma-default names: Staff_email_key, Lead_inquiryId_key, Client_leadId_key; FKs named <Table>_<col>_fkey. Indexes: Prisma's three (Lead_assignedToId_idx, Activity_leadId_idx, Activity_createdById_idx) plus obviously useful ones (Lead_status, Lead_createdAt, Activity_scheduledAt, ProjectInquiry_status, ProjectInquiry_createdAt, Client_status). Header comment block explains provenance and that updatedAt is app-managed (no DB default/trigger).
+- Created scripts/export-sqlite-data.ts (bun + @prisma/client, log: [], strict TS, read-only findMany only): exports in FK-safe order ProjectInquiry -> Staff -> Lead -> Activity -> Client, mapping Prisma scalars to Postgres literals (strings with doubled single quotes, Date -> ISO 8601 with ::timestamptz, null -> NULL, numbers plain, booleans TRUE/FALSE). Writes supabase/0002_data_export.sql with the required header line, BEGIN; ... COMMIT; wrapper, per-table row-count comments, and prints a per-table row count summary. Never modifies the database.
+- Ran bun scripts/export-sqlite-data.ts: ProjectInquiry 0, Staff 2, Lead 123, Activity 0, Client 0 (125 rows total) -> supabase/0002_data_export.sql (48 KB, 143 lines). Spot-checked head (header + BEGIN + Staff rows with scrypt hashes, TRUE/NULL/timestamptz literals) and tail (last Lead rows incl. assignedToId/inquiryId scalars + COMMIT). Output confirmed valid; lint exit 0; tsc --noEmit shows no errors in the new script.
+- Created SUPABASE_MIGRATION.md: 8-section non-expert guide (what migrates + row snapshot; prerequisites/connection strings from Project Settings -> Database incl. Session pooler 5432 vs direct/transaction 6543; Option A = SQL Editor paste-and-run or supabase db push for 0001_init.sql; Option B = provider switch to postgresql + bun run db:migrate --name init with the note that both produce identical structure; data import instructions incl. run-once-on-empty-tables + transaction wrapper; post-migration checklist incl. Table Editor row counts, provider switch + bun run db:generate when Option A was used, .env DATABASE_URL with ?pgbouncer=true&connection_limit=1 for port 6543 pooler, restart, smoke test; rollback via untouched SQLite file; security notes on the password-bearing connection string, the data file containing PII + password hashes, scrypt hashes migrating as-is, admin password staying in .env).
+
+Stage Summary:
+- Migration kit complete: supabase/migrations/0001_init.sql (schema, mirrors prisma/schema.prisma 1:1), scripts/export-sqlite-data.ts (read-only SQLite -> Postgres SQL exporter), supabase/0002_data_export.sql (generated: 0 inquiries / 2 staff / 123 leads / 0 activities / 0 clients = 125 rows, transaction-wrapped), SUPABASE_MIGRATION.md (step-by-step guide, options A/B, checklist, rollback, security).
+- Owner path: run 0001_init.sql in Supabase SQL Editor (or supabase db push), run 0002_data_export.sql on the empty tables, then switch provider to postgresql + bun run db:generate + point .env DATABASE_URL at Supabase and restart. SQLite file kept as rollback backup.
+- No existing files modified; no new dependencies; script verified read-only.
+
+---
+Task ID: 1-5, 7 (staff system) + 6 (supabase, subagent)
+Agent: main orchestrator (Z.ai Code)
+Task: Staff login system with per-member dashboards + assigned-lead isolation, and a Supabase migration kit.
+
+Work Log:
+- Schema: added `Staff` model (name/email unique/scrypt passwordHash/role admin|staff/active/lastLoginAt), `Lead.assignedToId` FK→Staff (SetNull, indexed), `Activity.createdById` FK→Staff (SetNull, indexed); `bun run db:push` + `db:generate`.
+- Auth libs: `src/lib/password.ts` (scrypt hash/verify, node:crypto, no deps), `src/lib/staff-session.ts` (HMAC-SHA256 signed cookie `runa_staff_session`, 24h TTL, payload v1.<id>.<role>.<exp>; `requireStaff()` re-checks DB active flag every request so deactivation is instant).
+- Seed: `scripts/seed-staff.ts` (idempotent) → admin@runalog.com / RunaAdmin@2025 (role admin) + staff@runalog.com / RunaStaff@2025 (role staff, 12 leads auto-assigned).
+- Staff APIs: /api/staff/{login,logout,leads,leads/[id],activities,activities/[id],stats} — role-scoped (staff → only assignedToId=self; admin role → all), PATCH limited to status/value/notes, activities POST validates lead ownership.
+- Admin APIs: /api/admin/staff (GET mapped leadCount/activityCount, POST), /api/admin/staff/[id] (PATCH incl. password reset, DELETE), leads GET/POST/PATCH now support assignedToId with assignee-exists validation, stats adds unassignedLeads + team breakdown.
+- Admin UI: nav "Staff" item; /admin/staff page (table with role/status/counts/last-login, create/edit dialogs with role select + active switch + optional password reset, delete confirm); lead dialog "Assigned to" picker; leads table Assignee column with avatar initials; dashboard "Team workload" card + unassigned badge.
+- Staff UI: /staff/login (server-guard, redirects if session valid), /staff/(panel)/layout guard, StaffShell (sidebar + mobile Sheet), dashboard (KPIs, today's schedule, recent leads, overdue alert), /staff/leads (chips, search, detail dialog with Progress tab + Calls&meetings tab incl. schedule form + complete/cancel with outcome prompt), /staff/calls (upcoming/past tabs).
+- Supabase kit (subagent Task 6): supabase/migrations/0001_init.sql (Postgres DDL mirror), scripts/export-sqlite-data.ts → supabase/0002_data_export.sql (125 rows), SUPABASE_MIGRATION.md guide.
+- Fixed during verification: dev server restart needed to load regenerated Prisma client; staff API GET /admin/staff count mapping; AlertDialog tag typo; react-hooks set-state-in-effect (extracted AddLeadDialog to own file, key-based dialog reset, adopted failed/retry load pattern).
+- Verified via Agent Browser: staff guard redirect, Alex login (12 scoped leads), status update New→Contacted, scheduled "Follow-up call", completed with outcome; admin login, staff page (create Priya), lead reassign Alex→Priya via dialog, Assignee column; Priya login sees exactly 1 lead. Mobile 390px: no horizontal overflow. Lint + tsc clean; dev.log clean.
+
+Stage Summary:
+- Staff system live: /staff (login + panel), /admin/staff (management). Credentials: admin@runalog.com/RunaAdmin@2025 (admin role), staff@runalog.com/RunaStaff@2025, priya@runalog.com/PriyaPass@2026 (test).
+- Access model: owner keeps /admin password login; team uses /staff email+password; no public links to either (direct URL only).
+- Supabase migration: run 0001_init.sql then 0002_data_export.sql in SQL Editor, then switch provider + DATABASE_URL per SUPABASE_MIGRATION.md; staff scrypt hashes migrate as-is.
+- Data state: 123 leads (12→Alex, 1→Priya, rest unassigned), 2 activities (1 overdue scheduled, 1 completed w/ outcome).

@@ -29,6 +29,24 @@ model ProjectInquiry {
   lead Lead?
 }
 
+// A team member who can sign in to the staff panel (/staff) and work
+// their assigned leads. Passwords are scrypt hashes (see src/lib/password.ts).
+model Staff {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  // admin — full access everywhere | staff — only their assigned leads
+  role         String    @default("staff")
+  active       Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  assignedLeads Lead[]     @relation("LeadAssignee")
+  activities    Activity[] @relation("ActivityCreator")
+}
+
 // A lead tracked by the sales workflow (added manually, imported from
 // CSV/XLSX, or converted from a website inquiry).
 model Lead {
@@ -44,12 +62,17 @@ model Lead {
   value     Float? // potential deal value (USD)
   notes     String?
   inquiryId String?  @unique
+  // Staff member responsible for this lead (null = unassigned, admin pool).
+  assignedToId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   inquiry    ProjectInquiry? @relation(fields: [inquiryId], references: [id])
+  assignedTo Staff?          @relation("LeadAssignee", fields: [assignedToId], references: [id])
   activities Activity[]
   client     Client?
+
+  @@index([assignedToId])
 }
 
 // A scheduled call / meeting / follow-up with a lead.
@@ -64,10 +87,17 @@ model Activity {
   status      String   @default("scheduled")
   outcome     String?
   notes       String?
+  // Staff member who scheduled the activity (null = owner/admin via panel).
+  createdById String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  createdBy Staff? @relation("ActivityCreator", fields: [createdById], references: [id])
+
+  @@index([leadId])
+  @@index([createdById])
 }
 
 // A paying / onboarded client, usually converted from a won lead.

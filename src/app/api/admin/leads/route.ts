@@ -25,6 +25,7 @@ const createSchema = z.object({
   status: z.enum(LEAD_STATUSES as [string, ...string[]]).optional(),
   value: z.number().min(0).max(1_000_000_000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
+  assignedToId: z.string().trim().max(64).nullable().optional(),
 });
 
 /** GET /api/admin/leads?status=&q= — list leads (newest first, with next scheduled activity). */
@@ -53,6 +54,7 @@ export async function GET(request: Request) {
         take: 1,
       },
       client: { select: { id: true, name: true } },
+      assignedTo: { select: { id: true, name: true } },
     },
   });
 
@@ -104,6 +106,7 @@ export async function POST(request: Request) {
       status: data.status ?? "new",
       value: data.value ?? null,
       notes: data.notes ?? null,
+      assignedToId: data.assignedToId ?? null,
     },
   });
 

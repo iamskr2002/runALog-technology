@@ -17,6 +17,7 @@ import {
   Loader2,
   LogOut,
   Menu,
+  UserCog,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -39,6 +40,7 @@ const NAV_ITEMS: AdminNavItem[] = [
   { href: "/admin/leads", label: "Leads", icon: Users },
   { href: "/admin/calls", label: "Calls & Meetings", icon: CalendarClock },
   { href: "/admin/clients", label: "Clients", icon: Briefcase },
+  { href: "/admin/staff", label: "Staff", icon: UserCog },
 ];
 
 function isNavItemActive(pathname: string, href: string): boolean {

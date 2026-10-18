@@ -16,6 +16,8 @@ const patchSchema = z.object({
     .optional(),
   value: z.number().min(0).max(1_000_000_000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
+  /** Staff id to assign the lead to (null = unassigned). */
+  assignedToId: z.string().trim().max(64).nullable().optional(),
 });
 
 /** GET /api/admin/leads/:id — lead detail with activity timeline. */
@@ -31,6 +33,7 @@ export async function GET(
     include: {
       activities: { orderBy: { scheduledAt: "desc" } },
       client: true,
+      assignedTo: { select: { id: true, name: true } },
     },
   });
 
@@ -59,6 +62,20 @@ export async function PATCH(
       { ok: false, message: "Invalid payload." },
       { status: 400 }
     );
+  }
+
+  // Validate the assignee exists when one is being set.
+  if (parsed.data.assignedToId) {
+    const assignee = await db.staff.findUnique({
+      where: { id: parsed.data.assignedToId },
+      select: { id: true },
+    });
+    if (!assignee) {
+      return NextResponse.json(
+        { ok: false, message: "Selected staff member no longer exists." },
+        { status: 400 }
+      );
+    }
   }
 
   try {

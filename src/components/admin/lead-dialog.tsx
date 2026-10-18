@@ -33,6 +33,7 @@ import {
   LEAD_STATUS_LABELS,
   useAdminErrorHandler,
   type AdminLead,
+  type AdminStaff,
   type LeadStatus,
 } from "@/components/admin/shared";
 
@@ -53,6 +54,8 @@ export function LeadDialog({ open, onOpenChange, lead, onSaved }: LeadDialogProp
   const [status, setStatus] = useState<LeadStatus>("new");
   const [value, setValue] = useState("");
   const [notes, setNotes] = useState("");
+  const [assignedToId, setAssignedToId] = useState<string>("unassigned");
+  const [staffOptions, setStaffOptions] = useState<AdminStaff[]>([]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const handleError = useAdminErrorHandler();
@@ -66,7 +69,14 @@ export function LeadDialog({ open, onOpenChange, lead, onSaved }: LeadDialogProp
     setStatus(lead?.status ?? "new");
     setValue(lead?.value !== null && lead?.value !== undefined ? String(lead.value) : "");
     setNotes(lead?.notes ?? "");
+    setAssignedToId(lead?.assignedTo?.id ?? "unassigned");
     setError(null);
+    // Load active team members for the assignment picker.
+    apiFetch<{ staff: AdminStaff[] }>("/api/admin/staff")
+      .then((data) =>
+        setStaffOptions(data.staff.filter((member) => member.active))
+      )
+      .catch(() => setStaffOptions([]));
   }, [open, lead]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -101,6 +111,7 @@ export function LeadDialog({ open, onOpenChange, lead, onSaved }: LeadDialogProp
       status,
       value: parsedValue,
       notes: notes.trim() || null,
+      assignedToId: assignedToId === "unassigned" ? null : assignedToId,
     };
 
     setPending(true);
@@ -219,6 +230,32 @@ export function LeadDialog({ open, onOpenChange, lead, onSaved }: LeadDialogProp
                 placeholder="12000"
               />
             </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="lead-assignee">Assigned to</Label>
+            <Select
+              value={assignedToId}
+              onValueChange={setAssignedToId}
+            >
+              <SelectTrigger id="lead-assignee" className="w-full">
+                <SelectValue placeholder="Unassigned" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="unassigned">
+                  Unassigned (admin pool)
+                </SelectItem>
+                {staffOptions.map((member) => (
+                  <SelectItem key={member.id} value={member.id}>
+                    {member.name}
+                    {member.role === "admin" ? " — admin" : ""}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-zinc-500">
+              Assigned staff members see and manage this lead from their own
+              dashboard.
+            </p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="lead-notes">Notes</Label>

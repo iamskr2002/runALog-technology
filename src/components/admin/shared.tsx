@@ -65,6 +65,19 @@ export type AdminLead = {
   updatedAt: string;
   nextActivity: AdminActivity | null;
   client: { id: string; name: string } | null;
+  assignedTo: { id: string; name: string } | null;
+};
+
+export type AdminStaff = {
+  id: string;
+  name: string;
+  email: string;
+  role: "admin" | "staff";
+  active: boolean;
+  lastLoginAt: string | null;
+  createdAt: string;
+  leadCount?: number;
+  activityCount?: number;
 };
 
 export type AdminClient = {
@@ -95,6 +108,16 @@ export type AdminStats = {
   clients: { total: number; active: number };
   activities: { upcoming: number };
   conversionRate: number;
+  unassignedLeads: number;
+  team: {
+    id: string;
+    name: string;
+    email: string;
+    role: "admin" | "staff";
+    active: boolean;
+    leadCount: number;
+    activityCount: number;
+  }[];
   recentInquiries: AdminInquiry[];
   upcomingActivities: AdminActivity[];
 };
