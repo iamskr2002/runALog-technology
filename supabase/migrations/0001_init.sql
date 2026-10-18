@@ -161,3 +161,14 @@ CREATE INDEX "Activity_scheduledAt_idx"  ON "Activity" ("scheduledAt");
 CREATE INDEX "ProjectInquiry_status_idx" ON "ProjectInquiry" ("status");
 CREATE INDEX "ProjectInquiry_createdAt_idx" ON "ProjectInquiry" ("createdAt");
 CREATE INDEX "Client_status_idx"         ON "Client" ("status");
+
+-- The application accesses these tables server-side through Prisma. Do not
+-- expose customer or staff data through the Supabase Data API by default.
+ALTER TABLE "ProjectInquiry" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Staff"          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Lead"           ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Activity"       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Client"         ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON TABLE "ProjectInquiry", "Staff", "Lead", "Activity", "Client"
+    FROM anon, authenticated;

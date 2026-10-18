@@ -25,20 +25,20 @@ Five tables, moved from `db/custom.db` (SQLite) into Supabase (Postgres):
 | `Activity` | Scheduled calls / meetings / follow-ups with leads |
 | `Client` | Onboarded clients, usually converted from a won lead |
 
-The data export generated with this kit contained:
+The refreshed export generated from the current local database contains:
 
 ```
 ProjectInquiry:   0 rows
 Staff:            2 rows
 Lead:           123 rows
-Activity:         0 rows
+Activity:         2 rows
 Client:           0 rows
-Total:          125 rows
+Total:          127 rows
 ```
 
-(Counts are a snapshot from when `scripts/export-sqlite-data.ts` last ran.
-If new rows were added to the SQLite database afterwards, re-run the export
-script before importing — see section 5.)
+Export the SQLite data before changing the Prisma provider or regenerating its
+client for PostgreSQL. The exporter uses Prisma and cannot read SQLite after
+the client has been generated for PostgreSQL.
 
 ---
 
@@ -107,7 +107,8 @@ Instead of running the SQL file, you can switch the Prisma toolchain to
 Postgres and let it create the tables. Both approaches produce the same
 structure — pick one, not both.
 
-1. Edit `prisma/schema.prisma` and change the datasource provider:
+1. Export the SQLite data as described in section 5 before changing providers.
+2. Set the datasource provider in `prisma/schema.prisma` to PostgreSQL:
 
    ```prisma
    datasource db {
@@ -116,13 +117,13 @@ structure — pick one, not both.
    }
    ```
 
-2. Put your Supabase connection string in `.env`:
+3. Put your Supabase connection string in `.env`:
 
    ```
    DATABASE_URL="postgresql://postgres.<project-ref>:<YOUR-PASSWORD>@<host>:5432/postgres"
    ```
 
-3. Regenerate the client and create the tables:
+4. Regenerate the client and create the tables:
 
    ```bash
    bun run db:generate          # rebuilds the Prisma client for Postgres
@@ -139,9 +140,10 @@ If you go this way, skip section 3 entirely.
 
 ## 5. Data migration
 
-The generated data file is `supabase/0002_data_export.sql` (125 rows as of
-the last run). If the SQLite database has changed since it was generated,
-regenerate it first — the script only reads the database, never modifies it:
+The generated data file is `supabase/0002_data_export.sql` (127 rows in the
+current snapshot). If the SQLite database has changed, regenerate the file
+before changing the provider and generating the PostgreSQL Prisma client. The
+script only reads the database; it never modifies it:
 
 ```bash
 bun scripts/export-sqlite-data.ts
@@ -176,7 +178,7 @@ Work through these steps after the data import:
 
 1. **Verify row counts.** In the Supabase Dashboard open **Table Editor** and
    check each table's row count against the export summary:
-   `ProjectInquiry 0 / Staff 2 / Lead 123 / Activity 0 / Client 0`
+   `ProjectInquiry 0 / Staff 2 / Lead 123 / Activity 2 / Client 0`
    (or the numbers from a newer export).
 2. **Switch Prisma to Postgres (if you used Option A).** The SQL-file path
    creates the tables, but the application itself still needs a Postgres-capable
@@ -235,8 +237,15 @@ Supabase side can damage it.
   Supabase (**Project Settings -> Database -> Reset database password**).
 - **The data export file contains personal data and password hashes.**
   `supabase/0002_data_export.sql` includes customer contact details and the
-  staff scrypt password hashes. Treat it like a database dump: do not commit
-  it, and delete it from your machine once the migration is verified.
+   staff scrypt password hashes. Treat it like a database dump: do not commit
+   it, and delete it from your machine once the migration is verified.
+- **Restrict the Supabase Data API.** The SQL migration creates tables but does
+   not configure public RLS policies. The SQL-file path enables RLS and revokes
+   `anon`/`authenticated` table privileges by default. If using Option B, apply
+   those same RLS and revoke statements from the end of
+   `supabase/migrations/0001_init.sql` after Prisma creates the tables. Keep
+   access server-side through Prisma unless direct client access is intentionally
+   configured.
 - **Staff passwords migrate as-is.** Passwords are stored as scrypt hashes
   (`src/lib/password.ts`); the hashes are copied unchanged and remain valid —
   nobody needs to reset their password after the migration.
