@@ -1,14 +1,17 @@
+
 import type { NextConfig } from "next";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
-  /* config options here */
+  // OpenNext builds the Cloudflare Worker from the Next.js output.
+  // Do not use output: "standalone" for this deployment.
   typescript: {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
-  // Allow the sandbox preview origin to load /_next/* dev assets without warnings.
   allowedDevOrigins: ["*.space-z.ai"],
 };
+
+initOpenNextCloudflareForDev();
 
 export default nextConfig;
