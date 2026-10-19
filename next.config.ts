@@ -10,6 +10,15 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: false,
   allowedDevOrigins: ["*.space-z.ai"],
+  serverExternalPackages: ["@prisma/client", ".prisma/client"],
+
+  outputFileTracingIncludes: {
+    "/*": [
+      "./node_modules/pg-cloudflare/dist/**",
+      "./node_modules/pg-cloudflare/esm/**",
+    ],
+  },
+
 };
 
 initOpenNextCloudflareForDev();
