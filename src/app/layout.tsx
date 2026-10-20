@@ -16,6 +16,10 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
+
+  verification: {
+    google: "72tL_ooKPwOoxE21jIqSPYSo_GVmK9IvdBKQ4D8q3n0", // <-- Paste your code here
+  },
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
   ),
