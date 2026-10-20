@@ -2,3 +2,7 @@ name = "runalog-technology"
 compatibility_date = "2024-12-30"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = ".open-next"
+
+[[kv_namespaces]]
+binding = "NEXT_CACHE_WORKERS"
+id = "263ba9b8bad340338d6eee2e922b8abf"
