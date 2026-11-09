@@ -17,7 +17,7 @@ import { navItems, siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
 /** Ordered section ids — the furthest-down intersecting section wins. */
-const SECTION_IDS = ["home", "services", "solutions", "work", "about", "contact"];
+const SECTION_IDS = ["home", "services", "custom-solutions", "work", "about", "contact"];
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
@@ -29,6 +29,7 @@ export function Navbar() {
   const [active, setActive] = useState<string>(isHome ? "home" : "");
   const [open, setOpen] = useState(false);
   const visibleRef = useRef<Set<string>>(new Set());
+  const pendingSectionRef = useRef<string | null>(null);
 
   // Solidify the bar once the page is scrolled.
   useEffect(() => {
@@ -140,6 +141,18 @@ export function Navbar() {
             <SheetContent
               side="right"
               className="w-[85vw] max-w-xs overflow-y-auto p-6 sm:max-w-xs"
+              onCloseAutoFocus={(event) => {
+                const id = pendingSectionRef.current;
+                if (!id) return;
+
+                event.preventDefault();
+                pendingSectionRef.current = null;
+                requestAnimationFrame(() => {
+                  document
+                    .getElementById(id)
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+              }}
             >
               <SheetTitle className="sr-only">Navigation menu</SheetTitle>
               <SheetDescription className="sr-only">
@@ -165,7 +178,16 @@ export function Navbar() {
                         <a
                           href={item.href}
                           aria-current={isActive ? "true" : undefined}
-                          onClick={() => setOpen(false)}
+                          onClick={(event) => {
+                            if (!isHome || !id) {
+                              setOpen(false);
+                              return;
+                            }
+
+                            event.preventDefault();
+                            pendingSectionRef.current = id;
+                            setOpen(false);
+                          }}
                           className={cn(
                             "flex items-center justify-between border-b border-border/60 py-3 text-base font-medium transition-colors last:border-0",
                             focusRing,
