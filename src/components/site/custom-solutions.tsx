@@ -70,6 +70,7 @@ function prefillServiceAndScroll(slug?: string) {
 export function CustomSolutions() {
   return (
     <section
+      id="custom-solutions"
       aria-labelledby="custom-solutions-heading"
       className="relative overflow-hidden bg-navy-900 py-20 text-white sm:py-24 lg:py-28"
     >

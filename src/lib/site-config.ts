@@ -15,9 +15,9 @@ export const siteConfig = {
     "We build powerful digital products, modern websites, and intelligent automations that help businesses work smarter, serve customers better, and grow faster.",
   // ── REPLACE with verified contact information ──────────────────────────
   contact: {
-    email: "hello@runalog.example", // PLACEHOLDER — replace with verified email
-    phone: "", // PLACEHOLDER — leave empty to hide, or add verified phone
-    location: "", // PLACEHOLDER — leave empty to hide, or add verified address
+    email: "runalogtechnologies@proton.me", // PLACEHOLDER — replace with verified email
+    phone: "+977-9769402656", // PLACEHOLDER — leave empty to hide, or add verified phone
+    location: "Kathmandu, Nepal", // PLACEHOLDER — leave empty to hide, or add verified address
     responseTime: "We typically reply within one business day.",
   },
   // ── REPLACE with verified professional profile URLs (or remove entries) ─
@@ -40,7 +40,7 @@ export type NavItem = { label: string; href: string };
 export const navItems: NavItem[] = [
   { label: "Home", href: "/#home" },
   { label: "Services", href: "/#services" },
-  { label: "Solutions", href: "/#solutions" },
+  { label: "Solutions", href: "/#custom-solutions" },
   { label: "Our Work", href: "/work" },
   { label: "About Us", href: "/#about" },
   { label: "Contact", href: "/#contact" },
@@ -73,10 +73,10 @@ export const serviceOptions = [
 export type ServiceSlug = (typeof serviceOptions)[number]["slug"];
 
 export const budgetOptions = [
-  "Under $5,000",
-  "$5,000 – $15,000",
-  "$15,000 – $50,000",
-  "$50,000+",
+  "Under Rs 15,000",
+  "Rs 15,000 – Rs 25,000",
+  "Rs 25,000 – Rs 35,000",
+  "Rs 35,000+",
   "Not sure yet",
 ] as const;
 
