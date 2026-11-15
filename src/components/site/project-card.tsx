@@ -6,7 +6,6 @@ import {
   Database,
   FileText,
   Inbox,
-  Info,
   ListChecks,
   Mail,
   type LucideIcon,
@@ -24,7 +23,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { ConceptProject, ProjectVisualKind } from "@/lib/work-data";
+import type { Project, ProjectVisualKind } from "@/lib/work-data";
 
 import { Reveal } from "./reveal";
 
@@ -358,7 +357,7 @@ export function ProjectCard({
   project,
   index = 0,
 }: {
-  project: ConceptProject;
+  project: Project;
   /** Grid position — staggers the reveal animation (delay = index * 80ms). */
   index?: number;
 }) {
@@ -382,9 +381,6 @@ export function ProjectCard({
             <div className="flex flex-wrap items-center gap-2">
               <Badge className="border-teal-600/20 bg-teal-600/10 text-teal-700">
                 {project.category}
-              </Badge>
-              <Badge variant="outline" className="text-muted-foreground">
-                Concept project
               </Badge>
             </div>
 
@@ -463,15 +459,6 @@ export function ProjectCard({
                   </li>
                 ))}
               </ul>
-            </div>
-            <div className="rounded-lg border border-border bg-muted p-4 text-sm text-muted-foreground">
-              <p className="flex items-start gap-2.5">
-                <Info className="mt-0.5 size-4 shrink-0 text-teal-700" aria-hidden="true" />
-                <span>
-                  This is a concept demonstration, not a client engagement. Real outcomes
-                  are published only when verified and authorized.
-                </span>
-              </p>
             </div>
           </div>
 

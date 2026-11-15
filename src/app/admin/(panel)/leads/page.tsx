@@ -12,13 +12,16 @@ import { toast } from "sonner";
 import {
   Briefcase,
   CalendarPlus,
+  CheckSquare,
   Loader2,
   MoreHorizontal,
   Pencil,
   Plus,
+  Square,
   Trash2,
   TrendingUp,
   Upload,
+  UserPlus,
   Users,
 } from "lucide-react";
 import {
@@ -70,6 +73,7 @@ import {
   statusBadgeClass,
   useAdminErrorHandler,
   type AdminLead,
+  type AdminStaff,
   type LeadStatus,
 } from "@/components/admin/shared";
 import { cn } from "@/lib/utils";
@@ -104,6 +108,8 @@ function LeadsInner() {
   const searchParams = useSearchParams();
   const [leads, setLeads] = useState<AdminLead[] | null>(null);
   const [pipelineFilter, setPipelineFilter] = useState<"all" | LeadStatus>("all");
+  const [selectedLeads, setSelectedLeads] = useState<Set<string>>(new Set());
+  const [staffOptions, setStaffOptions] = useState<AdminStaff[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
   const [editLead, setEditLead] = useState<AdminLead | null>(null);
   const [importOpen, setImportOpen] = useState(false);
@@ -112,12 +118,18 @@ function LeadsInner() {
   const [converting, setConverting] = useState(false);
   const [deleteLead, setDeleteLead] = useState<AdminLead | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [bulkUpdating, setBulkUpdating] = useState(false);
   const handleError = useAdminErrorHandler();
 
   const load = useCallback(async () => {
     try {
       const data = await apiFetch<LeadsResponse>("/api/admin/leads");
       setLeads(data.leads);
+
+      // Load staff options for bulk assignment
+      const staffData = await apiFetch<{ staff: AdminStaff[] }>("/api/admin/staff");
+      setStaffOptions(staffData.staff.filter((member) => member.active));
     } catch (error) {
       handleError(error, "Could not load leads.");
     }
@@ -196,6 +208,110 @@ function LeadsInner() {
     } finally {
       setDeleting(false);
     }
+  }
+
+  async function bulkDeleteLeads() {
+    if (selectedLeads.size === 0) return;
+    setBulkDeleting(true);
+    try {
+      await Promise.all(
+        Array.from(selectedLeads).map((id) =>
+          apiFetch(`/api/admin/leads/${id}`, { method: "DELETE" })
+        )
+      );
+      toast.success(`${selectedLeads.size} lead(s) deleted`);
+      setSelectedLeads(new Set());
+      await load();
+    } catch (error) {
+      handleError(error, "Could not delete some leads.");
+    } finally {
+      setBulkDeleting(false);
+    }
+  }
+
+  async function bulkUpdateStatus(status: LeadStatus) {
+    if (selectedLeads.size === 0) return;
+    setBulkUpdating(true);
+    const previous = leads;
+    setLeads(
+      (current) =>
+        current?.map((item) =>
+          selectedLeads.has(item.id) ? { ...item, status } : item
+        ) ?? current
+    );
+    try {
+      await Promise.all(
+        Array.from(selectedLeads).map((id) =>
+          apiFetch(`/api/admin/leads/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify({ status }),
+          })
+        )
+      );
+      toast.success(`${selectedLeads.size} lead(s) updated`);
+      setSelectedLeads(new Set());
+    } catch (error) {
+      setLeads(previous);
+      handleError(error, "Could not update some leads.");
+    } finally {
+      setBulkUpdating(false);
+    }
+  }
+
+  async function bulkAssignLeads(assignedToId: string) {
+    if (selectedLeads.size === 0) return;
+    setBulkUpdating(true);
+    const previous = leads;
+    const assignedStaff = staffOptions.find((s) => s.id === assignedToId);
+    setLeads(
+      (current) =>
+        current?.map((item) =>
+          selectedLeads.has(item.id)
+            ? { ...item, assignedTo: assignedStaff ?? null }
+            : item
+        ) ?? current
+    );
+    try {
+      await Promise.all(
+        Array.from(selectedLeads).map((id) =>
+          apiFetch(`/api/admin/leads/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify({
+              assignedToId: assignedToId === "unassigned" ? null : assignedToId,
+            }),
+          })
+        )
+      );
+      toast.success(
+        `${selectedLeads.size} lead(s) assigned to ${
+          assignedToId === "unassigned" ? "unassigned" : assignedStaff?.name ?? "staff"
+        }`
+      );
+      setSelectedLeads(new Set());
+    } catch (error) {
+      setLeads(previous);
+      handleError(error, "Could not assign some leads.");
+    } finally {
+      setBulkUpdating(false);
+    }
+  }
+
+  function toggleSelectAll() {
+    if (selectedLeads.size === filtered.length) {
+      setSelectedLeads(new Set());
+    } else {
+      setSelectedLeads(new Set(filtered.map((lead) => lead.id)));
+    }
+  }
+
+  function toggleSelectLead(id: string) {
+    const newSelection = new Set(selectedLeads);
+    if (newSelection.has(id)) {
+      newSelection.delete(id);
+    } else {
+      newSelection.add(id);
+    }
+    setSelectedLeads(newSelection);
   }
 
   const scheduleLeads = useMemo(
@@ -282,6 +398,82 @@ function LeadsInner() {
         ))}
       </div>
 
+      {/* Bulk actions toolbar */}
+      {selectedLeads.size > 0 && (
+        <Card className="flex items-center justify-between gap-4 border-teal-200 bg-teal-50 p-4">
+          <div className="flex items-center gap-3">
+            <CheckSquare className="size-5 text-teal-700" aria-hidden="true" />
+            <span className="font-medium text-teal-900">
+              {selectedLeads.size} lead{selectedLeads.size !== 1 ? "s" : ""} selected
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Select onValueChange={(value) => void bulkAssignLeads(value)} disabled={bulkUpdating}>
+              <SelectTrigger size="sm" className="w-40 border-teal-300 bg-white">
+                <SelectValue placeholder="Assign to..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="unassigned">
+                  <span className="flex items-center gap-2">
+                    <Users className="size-4 text-zinc-400" aria-hidden="true" />
+                    Unassigned
+                  </span>
+                </SelectItem>
+                {staffOptions.map((staff) => (
+                  <SelectItem key={staff.id} value={staff.id}>
+                    <span className="flex items-center gap-2">
+                      <span className="flex size-5 items-center justify-center rounded-full bg-teal-100 text-[0.6rem] font-semibold text-teal-700">
+                        {staff.name
+                          .split(" ")
+                          .map((part) => part[0])
+                          .slice(0, 2)
+                          .join("")
+                          .toUpperCase()}
+                      </span>
+                      {staff.name}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select onValueChange={(value) => void bulkUpdateStatus(value as LeadStatus)} disabled={bulkUpdating}>
+              <SelectTrigger size="sm" className="w-40 border-teal-300 bg-white">
+                <SelectValue placeholder="Update status" />
+              </SelectTrigger>
+              <SelectContent>
+                {LEAD_STATUSES.map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {LEAD_STATUS_LABELS[status]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void bulkDeleteLeads()}
+              disabled={bulkDeleting}
+              className="border-red-300 bg-white text-red-700 hover:bg-red-50"
+            >
+              {bulkDeleting ? (
+                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Trash2 className="size-4" aria-hidden="true" />
+              )}
+              Delete selected
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedLeads(new Set())}
+              className="text-teal-700 hover:bg-teal-100"
+            >
+              Clear selection
+            </Button>
+          </div>
+        </Card>
+      )}
+
       {/* Table */}
       <Card className="gap-0 py-0">
         <div className="p-0">
@@ -306,6 +498,20 @@ function LeadsInner() {
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
+                    <TableHead className="w-12">
+                      <button
+                        type="button"
+                        onClick={toggleSelectAll}
+                        className="flex size-5 items-center justify-center rounded border-2 border-zinc-300 transition-colors hover:border-teal-600"
+                        aria-label="Select all leads"
+                      >
+                        {selectedLeads.size === filtered.length && filtered.length > 0 ? (
+                          <CheckSquare className="size-5 text-teal-600" aria-hidden="true" />
+                        ) : (
+                          <Square className="size-5 text-zinc-400" aria-hidden="true" />
+                        )}
+                      </button>
+                    </TableHead>
                     <TableHead>Lead</TableHead>
                     <TableHead>Company</TableHead>
                     <TableHead>Source</TableHead>
@@ -320,8 +526,23 @@ function LeadsInner() {
                 <TableBody>
                   {filtered.map((lead) => {
                     const source = SOURCE_BADGES[lead.source] ?? SOURCE_BADGES.manual;
+                    const isSelected = selectedLeads.has(lead.id);
                     return (
-                      <TableRow key={lead.id}>
+                      <TableRow key={lead.id} className={cn(isSelected && "bg-teal-50/50")}>
+                        <TableCell>
+                          <button
+                            type="button"
+                            onClick={() => toggleSelectLead(lead.id)}
+                            className="flex size-5 items-center justify-center rounded border-2 border-zinc-300 transition-colors hover:border-teal-600"
+                            aria-label={`Select ${lead.name}`}
+                          >
+                            {isSelected ? (
+                              <CheckSquare className="size-5 text-teal-600" aria-hidden="true" />
+                            ) : (
+                              <Square className="size-5 text-zinc-400" aria-hidden="true" />
+                            )}
+                          </button>
+                        </TableCell>
                         <TableCell className="max-w-48 whitespace-nowrap">
                           <p className="truncate font-medium text-zinc-900">
                             {lead.name}
