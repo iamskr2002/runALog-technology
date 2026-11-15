@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { conceptProjects } from "@/lib/work-data";
+import { projects } from "@/lib/work-data";
 
 import { ProjectCard } from "./project-card";
 import { Reveal } from "./reveal";
@@ -29,12 +29,12 @@ export function Work() {
         <SectionHeading
           id="work-heading"
           eyebrow="Our Work"
-          title="Selected solutions, clearly labeled."
-          description="These are concept and demonstration projects that show the kinds of solutions we build. Live case studies with verified client outcomes will be published here as they're authorized."
+          title="Featured projects & solutions."
+          description="A selection of digital products, web platforms, automations, and growth campaigns we've designed and delivered."
         />
 
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {conceptProjects.slice(0, 4).map((project, i) => (
+          {projects.slice(0, 4).map((project, i) => (
             <ProjectCard key={project.title} project={project} index={i} />
           ))}
 
@@ -125,7 +125,7 @@ export function Work() {
           </Reveal>
         </div>
 
-        {/* View all concept work — dedicated page */}
+        {/* View all work — dedicated page */}
         <Reveal delay={120} className="mt-12 flex flex-col items-center gap-3 text-center">
           <Button
             asChild
@@ -142,7 +142,7 @@ export function Work() {
             </Link>
           </Button>
           <p className="text-sm text-muted-foreground">
-            More concept work across applications, websites, automation and marketing.
+            Explore more of our work across applications, websites, automation, and marketing.
           </p>
         </Reveal>
       </div>

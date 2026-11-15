@@ -7,10 +7,15 @@ let client: PrismaClient | undefined;
 function getClient() {
   if (client) return client;
 
-  const { env } = getCloudflareContext();
-  const connectionString = (
-    env as unknown as { DATABASE_URL: string }
-  ).DATABASE_URL;
+  // In local dev, use process.env; in production (Cloudflare), use getCloudflareContext
+  let connectionString: string | undefined;
+
+  if (process.env.NODE_ENV === "development") {
+    connectionString = process.env.DATABASE_URL;
+  } else {
+    const { env } = getCloudflareContext();
+    connectionString = (env as unknown as { DATABASE_URL: string }).DATABASE_URL;
+  }
 
   if (!connectionString) {
     throw new Error("DATABASE_URL is not configured");

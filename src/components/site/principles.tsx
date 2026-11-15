@@ -58,7 +58,7 @@ export function Principles() {
           id="principles-heading"
           eyebrow="How We Work"
           title="Principles we hold every project to."
-          description="We'd rather show you how we operate than fill this page with borrowed quotes — real client testimonials will appear here only when we have them, with permission."
+          description="Clear expectations, transparent communication, and engineering rigor guide every engagement we take on."
         />
 
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

@@ -5,6 +5,7 @@ import { WhyUs } from "@/components/site/why-us";
 import { Process } from "@/components/site/process";
 import { SolutionsByNeed } from "@/components/site/solutions-by-need";
 import { Work } from "@/components/site/work";
+import { Testimonials } from "@/components/site/testimonials";
 import { CustomSolutions } from "@/components/site/custom-solutions";
 import { Principles } from "@/components/site/principles";
 import { Contact } from "@/components/site/contact";
@@ -40,6 +41,7 @@ export default function Home() {
         <Process />
         <SolutionsByNeed />
         <Work />
+        <Testimonials />
         <CustomSolutions />
         <Principles />
         <Contact />

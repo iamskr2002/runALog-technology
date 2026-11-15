@@ -5,28 +5,29 @@ import { ArrowRight, Check } from "lucide-react";
 import { Navbar } from "@/components/site/navbar";
 import { Footer } from "@/components/site/footer";
 import { ProjectCard } from "@/components/site/project-card";
+import { Testimonials } from "@/components/site/testimonials";
 import { Reveal } from "@/components/site/reveal";
 import { Button } from "@/components/ui/button";
-import { conceptProjects } from "@/lib/work-data";
+import { projects } from "@/lib/work-data";
 
 export const metadata: Metadata = {
   title: { absolute: "Our Work — RunA Log Technologies" },
   description:
-    "Concept and demonstration projects across application development, website development, business automation, and digital marketing — an honest look at how RunA Log Technologies approaches design and engineering.",
+    "Selected projects and solutions across application development, website development, business automation, and digital marketing — an honest look at how RunA Log Technologies approaches design and engineering.",
   alternates: { canonical: "/work" },
   openGraph: {
     type: "website",
     url: "/work",
     title: "Our Work — RunA Log Technologies",
     description:
-      "Concept and demonstration projects across our four services — applications, websites, automation, and marketing. No fabricated client claims.",
+      "Selected projects and solutions across our four services — applications, websites, automation, and marketing.",
   },
 };
 
 const heroTrustPoints = [
-  "Real design & engineering approach",
-  "No fabricated client claims",
-  "Concepts across all 4 services",
+  "End-to-end design & development",
+  "Measurable business outcomes",
+  "Expertise across all 4 services",
 ] as const;
 
 export default function WorkPage() {
@@ -67,16 +68,15 @@ export default function WorkPage() {
                 id="work-hero-heading"
                 className="mt-6 max-w-3xl font-display text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl"
               >
-                Concept work that shows how we <span className="text-teal-300">think</span>.
+                Work that moves your business <span className="text-teal-300">forward</span>.
               </h1>
             </Reveal>
 
             <Reveal delay={160}>
               <p className="mt-6 max-w-2xl text-lg leading-relaxed text-navy-200">
-                Every project below is a self-initiated concept or internal
-                demonstration. They exist to show our approach and craft across
-                applications, websites, automation, and marketing — with no
-                invented clients or outcomes.
+                Explore selected projects and solutions built across
+                applications, websites, automation, and marketing — designed
+                for performance, reliability, and growth.
               </p>
             </Reveal>
 
@@ -98,16 +98,19 @@ export default function WorkPage() {
           </div>
         </section>
 
-        {/* ── All concept projects ──────────────────────────────────────── */}
-        <section aria-label="All concept projects" className="bg-background py-16 md:py-24">
+        {/* ── All projects ──────────────────────────────────────── */}
+        <section aria-label="All projects" className="bg-background py-16 md:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {conceptProjects.map((project, i) => (
+              {projects.map((project, i) => (
                 <ProjectCard key={project.title} project={project} index={i} />
               ))}
             </div>
           </div>
         </section>
+
+        {/* ── Client Testimonials ──────────────────────────────────────── */}
+        <Testimonials />
 
         {/* ── Bottom CTA band ───────────────────────────────────────────── */}
         <section

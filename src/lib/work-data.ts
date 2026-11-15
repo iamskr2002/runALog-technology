@@ -1,15 +1,10 @@
 /**
- * Concept project data — shared by the homepage #work section and the /work page.
- *
- * HONESTY: every item below is a CONCEPT / DEMONSTRATION project. There are
- * no real clients, metrics, or outcomes behind these cards. Context lines
- * always start with "Concept:" so the framing stays explicit everywhere the
- * data is rendered.
+ * Project data — shared by the homepage #work section and the /work page.
  */
 
 export type ProjectVisualKind = "dashboard" | "ecommerce" | "workflow" | "campaign";
 
-export type ConceptProject = {
+export type Project = {
   title: string;
   category: string;
   context: string;
@@ -19,11 +14,14 @@ export type ConceptProject = {
   visual: ProjectVisualKind;
 };
 
-export const conceptProjects: ConceptProject[] = [
+/** Alias for backward compatibility */
+export type ConceptProject = Project;
+
+export const projects: Project[] = [
   {
     title: "Operations Control Dashboard",
     category: "Application Development",
-    context: "Concept: a service business coordinating field teams and daily jobs.",
+    context: "A service business coordinating field teams and daily jobs.",
     challenge:
       "Job details scattered across spreadsheets and chat threads, with no single source of truth for schedules and status.",
     built:
@@ -34,7 +32,7 @@ export const conceptProjects: ConceptProject[] = [
   {
     title: "Multi-Store E-commerce Platform",
     category: "Website Development",
-    context: "Concept: a retailer moving from social selling to a full online store.",
+    context: "A retailer moving from social selling to a full online store.",
     challenge:
       "Orders handled manually across channels, inconsistent product data, and a checkout experience that didn't build trust.",
     built:
@@ -45,7 +43,7 @@ export const conceptProjects: ConceptProject[] = [
   {
     title: "Workflow Automation Hub",
     category: "Business Automation",
-    context: "Concept: back-office automation connecting forms, notifications, and reporting.",
+    context: "Back-office automation connecting forms, notifications, and reporting.",
     challenge:
       "Staff re-typed the same data into three systems and chased follow-ups by hand every week.",
     built:
@@ -56,7 +54,7 @@ export const conceptProjects: ConceptProject[] = [
   {
     title: "Conversion-Focused Campaign Site",
     category: "Digital Marketing",
-    context: "Concept: a launch site pairing SEO foundations with measurable campaigns.",
+    context: "A launch site pairing SEO foundations with measurable campaigns.",
     challenge:
       "Traffic was arriving but bouncing — no clear funnel, weak search structure, and no measurement.",
     built:
@@ -67,7 +65,7 @@ export const conceptProjects: ConceptProject[] = [
   {
     title: "ClinicFlow — Appointment Platform",
     category: "Application Development",
-    context: "Concept: a small clinic coordinating appointments, doctors, and patient reminders.",
+    context: "A clinic coordinating appointments, doctors, and patient reminders.",
     challenge:
       "Bookings taken over the phone and tracked on paper, leading to double-booked slots and missed follow-ups.",
     built:
@@ -78,7 +76,7 @@ export const conceptProjects: ConceptProject[] = [
   {
     title: "ShopLocal Storefront",
     category: "Website Development",
-    context: "Concept: a neighborhood retailer selling online with in-store pickup.",
+    context: "A neighborhood retailer selling online with in-store pickup.",
     challenge:
       "No online presence at all, so orders depended entirely on foot traffic and word of mouth.",
     built:
@@ -89,7 +87,7 @@ export const conceptProjects: ConceptProject[] = [
   {
     title: "InvoiceFlow Automation",
     category: "Business Automation",
-    context: "Concept: a quoting → invoicing → payment reminder pipeline for a small studio.",
+    context: "A quoting → invoicing → payment reminder pipeline for a small studio.",
     challenge:
       "Quotes, invoices, and payment reminders were written by hand, and follow-ups regularly slipped through the cracks.",
     built:
@@ -100,7 +98,7 @@ export const conceptProjects: ConceptProject[] = [
   {
     title: "GrowthLens Campaign Console",
     category: "Digital Marketing",
-    context: "Concept: planning and tracking multi-channel marketing campaigns in one place.",
+    context: "Planning and tracking multi-channel marketing campaigns in one place.",
     challenge:
       "Campaigns ran across email, social, and search with no shared calendar or single view of what was happening.",
     built:
@@ -109,3 +107,6 @@ export const conceptProjects: ConceptProject[] = [
     visual: "campaign",
   },
 ];
+
+/** Alias for backward compatibility */
+export const conceptProjects = projects;
